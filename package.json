@@ -34,10 +34,12 @@
     "tslint-config-prettier": "^1.14.0",
     "tslint-no-focused-test": "^0.5.0",
     "tslint-plugin-prettier": "^2.0.1",
+    "type-graphql": "^0.17.1",
     "typescript": "^3.6.3"
   },
   "peerDependencies": {
-    "honeycomb-beeline": "git+ssh://git@github.com/rumbleship/beeline-nodejs.git#master"
+    "honeycomb-beeline": "git+ssh://git@github.com/rumbleship/beeline-nodejs.git#master",
+    "type-graphql": "^0.17.1"
   },
   "jest": {
     "testEnvironment": "node"
