@@ -27,6 +27,7 @@
     "jest": "^24.0.0",
     "prettier": "^1.14.3",
     "prettier-tslint": "^0.4.0",
+    "reflect-metadata": "^0.1.13",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.0.2",
     "tslint": "^5.10.0",
@@ -39,6 +40,7 @@
   },
   "peerDependencies": {
     "honeycomb-beeline": "git+ssh://git@github.com/rumbleship/beeline-nodejs.git#master",
+    "reflect-metadata": "^0.1.13",
     "type-graphql": "^0.17.1"
   },
   "jest": {
