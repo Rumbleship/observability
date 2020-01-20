@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 ### Removed
-### Changed
+### Changed 
+  * package name is now `@rumbleship/o11y` for brevity
 ### Fixed
 ### Deprecated
 ### Security
