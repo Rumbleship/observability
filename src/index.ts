@@ -1,1 +1,1 @@
-export class Foo {}
+export * from './with-async-span';
