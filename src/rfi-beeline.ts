@@ -1,0 +1,116 @@
+export class HoneycombBeelineFactory {
+  private static globalBeeline: any;
+  /**
+   * @param config Configuration
+   * @param config.writeKey The honeycomb API key
+   * @param config.dataset Dataset -- [production|staging|sandbox|development-{yourname}]
+   * @param config.serviceName Servicename [alpha|banking|mediator|...etc]
+   */
+  constructor(config: { writeKey: string; dataset: string; serviceName: string }) {
+    if (!HoneycombBeelineFactory.globalBeeline) {
+      HoneycombBeelineFactory.globalBeeline = require('honeycomb-beeline')({
+        ...config,
+        enabledInstrumentations: ['http', 'https', 'sequelize', 'mysql2', '@hapi/hapi']
+      });
+    }
+  }
+  make(
+    requestId: string,
+    beelineImplementation: any = HoneycombBeelineFactory.globalBeeline
+  ): RFIBeeline {
+    return new RFIBeeline(requestId, beelineImplementation);
+  }
+}
+
+export class RFIBeeline {
+  private _beelineImplementation: any;
+  constructor(public requestId: string, beelineImplementation?: any) {
+    if (!beelineImplementation.withTraceContextFromRequestId) {
+      beelineImplementation.withTraceContextFromRequestId = (_requestId: any, fn: () => any) => {
+        return fn();
+      };
+    }
+    this._beelineImplementation = beelineImplementation;
+    Object.entries(this._beelineImplementation).forEach(([k, v]) => {
+      // We override the native bindFunctionToTrace, + mirror skipping of native
+      if (k === 'configure' || k === 'bindFunctionToTrace') {
+        return;
+      }
+      (this as any)[k] = v;
+    });
+  }
+
+  get beeline() {
+    return this._beelineImplementation;
+  }
+
+  // tslint:disable-next-line: ban-types
+  withAsyncSpan(this: any, spanData: any, spanFn: Function): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const value = (this as any).startAsyncSpan(spanData, (span: any) => {
+        let innerValue;
+        try {
+          innerValue = spanFn(span);
+        } catch (error) {
+          // catch errors here and update the span
+          this.addContext({
+            error: `${error}`,
+            'error.message': error.message,
+            'error.stack': error.stack
+          });
+
+          // re-throw here so the calling function can
+          // decide to do something about the error
+          throw error;
+        } finally {
+          // If it's not a promise and the spanFn throws
+          // this is our only chance to finish the span!
+          if (!isPromise(innerValue)) {
+            this.finishSpan(span);
+          }
+        }
+
+        if (isPromise(innerValue)) {
+          innerValue
+            .catch((error: Error) => {
+              // catch errors here and update the span
+              this.addContext({
+                error: `${error}`,
+                'error.message': error.message,
+                'error.stack': error.stack
+              });
+              throw error;
+            })
+            .finally(() => {
+              this.finishSpan(span);
+            });
+        }
+
+        return innerValue;
+      });
+
+      // Now that we have the return value we just forward it
+      if (isPromise(value)) {
+        value.then(resolve).catch(reject);
+      } else {
+        resolve(value);
+      }
+    });
+  }
+
+  bindFunctionToTrace(fn: () => any) {
+    if (this.beeline.withTraceContextFromRequestId) {
+      return this.beeline.withTraceContextFromRequestId(this.requestId, fn);
+    }
+    return this.beeline.bindFunctionToTrace(fn);
+  }
+}
+
+// tslint:disable-next-line: interface-name
+export interface IHoneycombBeelineFactory {
+  make: (requestId: string, beelineImplementation?: any) => RFIBeeline;
+}
+
+function isPromise(p: any) {
+  return p && typeof p.then === 'function';
+}
