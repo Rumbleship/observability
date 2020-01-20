@@ -1,1 +1,1 @@
-export class Authorizer {}
+export * from './rfi-beeline';
