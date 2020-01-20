@@ -13,7 +13,18 @@ export declare class HoneycombBeelineFactory {
     });
     make(requestId: string, beelineImplementation?: any): RFIBeeline;
 }
-export declare class RFIBeeline {
+export declare abstract class Beeline {
+    withSpan(...args: any[]): void;
+    withAsyncSpan(...args: any[]): void;
+    withTrace(...args: any[]): void;
+    startTrace(...args: any[]): void;
+    finishTrace(...args: any[]): void;
+    startSpan(...args: any[]): void;
+    finishSpan(...args: any[]): void;
+    startAsyncSpan(...args: any[]): void;
+    bindFunctionToTrace(...args: any[]): void;
+}
+export declare class RFIBeeline extends Beeline {
     requestId: string;
     private _beelineImplementation;
     constructor(requestId: string, beelineImplementation?: any);
