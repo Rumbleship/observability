@@ -8,9 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
+  * Basic abstract class type, `Beeline` for typesafety
+  * `WithSpan` method decorator
+  * `reflect-metadata` dependency
 ### Removed
 ### Changed
 ### Fixed
+  * Correctly wrap `resolve` context in async spans
 ### Deprecated
 ### Security
 
