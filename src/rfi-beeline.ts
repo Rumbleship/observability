@@ -89,6 +89,12 @@ export class RFIBeeline extends Beeline {
             'error.stack': error.stack
           });
 
+          if (error.extensions) {
+            for (const [k, v] of Object.entries(error.extensions)) {
+              this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+            }
+          }
+
           // re-throw here so the calling function can
           // decide to do something about the error
           throw error;
@@ -109,6 +115,11 @@ export class RFIBeeline extends Beeline {
                 'error.message': error.message,
                 'error.stack': error.stack
               });
+              if ((error as any).extensions) {
+                for (const [k, v] of Object.entries((error as any).extensions)) {
+                  this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+                }
+              }
               throw error;
             })
             .finally(() => {
