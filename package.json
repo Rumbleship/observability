@@ -1,11 +1,11 @@
 {
-  "name": "@rumbleship/template-library",
+  "name": "@rumbleship/observability",
   "version": "0.0.0",
   "authors": [
     "Isaac Sparling <isaac@rumbleship.com"
   ],
   "main": "lib/index.js",
-  "description": "Template for new TypeScript libraries at Rumbleship",
+  "description": "Helpers and tools for simpler interface with Honeycomb / Observability stack",
   "license": "UNLICENSED",
   "private": true,
   "engines": {
