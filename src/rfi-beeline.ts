@@ -22,9 +22,39 @@ export class HoneycombBeelineFactory {
   }
 }
 
-export class RFIBeeline {
+export abstract class Beeline {
+  withSpan(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  withAsyncSpan(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  withTrace(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  startTrace(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  finishTrace(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  startSpan(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  finishSpan(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  startAsyncSpan(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+  bindFunctionToTrace(...args: any[]) {
+    throw new Error('missing implementation');
+  }
+}
+export class RFIBeeline extends Beeline {
   private _beelineImplementation: any;
   constructor(public requestId: string, beelineImplementation?: any) {
+    super();
     if (!beelineImplementation.withTraceContextFromRequestId) {
       beelineImplementation.withTraceContextFromRequestId = (_requestId: any, fn: () => any) => {
         return fn();
