@@ -23,13 +23,15 @@ export declare abstract class Beeline {
     finishSpan(...args: any[]): void;
     startAsyncSpan(...args: any[]): void;
     bindFunctionToTrace(...args: any[]): void;
+    addContext(context: object): void;
 }
 export declare class RFIBeeline extends Beeline {
     requestId: string;
     private _beelineImplementation;
     constructor(requestId: string, beelineImplementation?: any);
     get beeline(): any;
-    withAsyncSpan(this: any, spanData: any, spanFn: Function): Promise<any>;
+    withSpan(...args: any[]): void;
+    withAsyncSpan(spanData: any, spanFn: Function): Promise<any>;
     bindFunctionToTrace(fn: () => any): any;
 }
 export interface IHoneycombBeelineFactory {
