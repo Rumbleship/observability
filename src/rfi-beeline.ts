@@ -50,6 +50,9 @@ export abstract class Beeline {
   bindFunctionToTrace(...args: any[]) {
     throw new Error('missing implementation');
   }
+  addContext(context: object) {
+    throw new Error('missing implementation');
+  }
 }
 export class RFIBeeline extends Beeline {
   private _beelineImplementation: any;
@@ -74,8 +77,19 @@ export class RFIBeeline extends Beeline {
     return this._beelineImplementation;
   }
 
+  withSpan(...args: any[]) {
+    try {
+      return super.withSpan(args);
+    } catch (error) {
+      if (error.extensions) {
+        for (const [k, v] of Object.entries(error.extensions)) {
+          this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+        }
+      }
+    }
+  }
   // tslint:disable-next-line: ban-types
-  withAsyncSpan(this: any, spanData: any, spanFn: Function): Promise<any> {
+  withAsyncSpan(spanData: any, spanFn: Function): Promise<any> {
     return new Promise((resolve, reject) => {
       const value = (this as any).startAsyncSpan(spanData, (span: any) => {
         let innerValue;
@@ -88,6 +102,12 @@ export class RFIBeeline extends Beeline {
             'error.message': error.message,
             'error.stack': error.stack
           });
+
+          if (error.extensions) {
+            for (const [k, v] of Object.entries(error.extensions)) {
+              this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+            }
+          }
 
           // re-throw here so the calling function can
           // decide to do something about the error
@@ -109,6 +129,11 @@ export class RFIBeeline extends Beeline {
                 'error.message': error.message,
                 'error.stack': error.stack
               });
+              if ((error as any).extensions) {
+                for (const [k, v] of Object.entries((error as any).extensions)) {
+                  this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+                }
+              }
               throw error;
             })
             .finally(() => {
