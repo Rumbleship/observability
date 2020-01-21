@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
-  * Automatic context-population for ApolloErrorExtensions
 ### Removed
   * `WithSpan` method decorator -- duplicative of what instrumentation already provides
 ### Changed
@@ -16,6 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Deprecated
 ### Security
 
+
+## [0.0.4] -- 2020-01-20
+
+### Added
+  * Automatic context-population for ApolloErrorExtensions
 
 ## [0.0.3] -- 2020-01-20
 
