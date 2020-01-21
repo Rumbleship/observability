@@ -79,7 +79,7 @@ export class RFIBeeline extends Beeline {
 
   withSpan(...args: any[]) {
     try {
-      return super.withSpan(args);
+      return super.withSpan(...args);
     } catch (error) {
       if (error.extensions) {
         for (const [k, v] of Object.entries(error.extensions)) {
