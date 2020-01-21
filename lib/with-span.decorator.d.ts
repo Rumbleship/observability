@@ -1,2 +1,6 @@
 import 'reflect-metadata';
-export declare function WithSpan(context?: object): MethodDecorator;
+export interface SpanData {
+    name: string;
+    [index: string]: string;
+}
+export declare function WithSpan(context?: SpanData): MethodDecorator;
