@@ -31,7 +31,7 @@ export declare class RFIBeeline extends Beeline {
     constructor(requestId: string, beelineImplementation?: any);
     get beeline(): any;
     withSpan(...args: any[]): void;
-    withAsyncSpan(spanData: any, spanFn: Function): Promise<any>;
+    withAsyncSpan(this: RFIBeeline, spanData: any, spanFn: Function): Promise<any>;
     bindFunctionToTrace(fn: () => any): any;
 }
 export interface IHoneycombBeelineFactory {
