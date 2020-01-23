@@ -1,5 +1,4 @@
 import { NextFn, ResolverData, MiddlewareInterface } from 'type-graphql';
-
 export class HoneycombMiddleware implements MiddlewareInterface {
   use({ root, args, context, info }: ResolverData, next: NextFn) {
     if (context) {
@@ -12,6 +11,7 @@ export class HoneycombMiddleware implements MiddlewareInterface {
           'app.gql.parentType.name': info.parentType.name,
           'app.gql.fieldName': info.fieldName
         };
+
         for (const [arg, argValue] of Object.entries(args)) {
           rfiBeeline.beeline.addContext({
             [`app.gql.params.${arg}`]: argValue
@@ -20,8 +20,11 @@ export class HoneycombMiddleware implements MiddlewareInterface {
 
         return rfiBeeline.withAsyncSpan(beelineContext, async () => {
           const result = await next();
-          // Spliting these up to simplify dropping breakpoints for context discovery.
-          // Maybe we want to add returned data to the span context here?
+          if (result && result.id) {
+            rfiBeeline.addContext({
+              'app.relay.node.id': result.id.oid || result.id
+            });
+          }
           return result;
         });
       });
@@ -30,3 +33,9 @@ export class HoneycombMiddleware implements MiddlewareInterface {
     }
   }
 }
+
+/**
+ * check root for span
+ * create span with parentid from root span
+ * set span on current root
+ */
