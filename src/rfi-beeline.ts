@@ -58,11 +58,14 @@ export class RFIBeeline extends Beeline {
   private _beelineImplementation: any;
   constructor(public requestId: string, beelineImplementation?: any) {
     super();
-    if (!beelineImplementation.withTraceContextFromRequestId) {
-      beelineImplementation.withTraceContextFromRequestId = (_requestId: any, fn: () => any) => {
-        return fn();
-      };
-    }
+    // `withTraceContextFromRequestId` is added to the Beeline in our fork to enable tracking
+    // traces across the internal Hapi request bus. However, it is _functionally_ the same as
+    // plain `bindFunctionToTrace`...so just do that.
+    // if (!beelineImplementation.withTraceContextFromRequestId) {
+    //   beelineImplementation.withTraceContextFromRequestId = (_requestId: any, fn: () => any) => {
+    //     return fn();
+    //   };
+    // }
     this._beelineImplementation = beelineImplementation;
     Object.entries(this._beelineImplementation).forEach(([k, v]) => {
       // We override the native bindFunctionToTrace, + mirror skipping of native
@@ -89,7 +92,7 @@ export class RFIBeeline extends Beeline {
     }
   }
   // tslint:disable-next-line: ban-types
-  withAsyncSpan(spanData: any, spanFn: Function): Promise<any> {
+  withAsyncSpan(this: RFIBeeline, spanData: any, spanFn: Function): Promise<any> {
     return new Promise((resolve, reject) => {
       const value = (this as any).startAsyncSpan(spanData, (span: any) => {
         let innerValue;
