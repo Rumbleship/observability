@@ -9,7 +9,6 @@ export function WithSpan(context: object = {}): MethodDecorator {
       // If we're in a SequelizeBaseService vs a RelayService (?)
       const { rfiBeeline } = (this as any).ctx || args[0];
       // tslint:disable-next-line: no-console
-      console.log('withspan', context);
       const return_type = Reflect.getMetadata('design:returntype', target, propertyName);
       const spanContext = {
         'origin.type': 'decorator',

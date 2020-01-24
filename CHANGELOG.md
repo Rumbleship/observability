@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 ### Changed
 ### Fixed
+  * If the beeline isn't instrumented for Hapi, our subclasses `bindFuctionToTrace` also self-executes the wrapped bind.
 ### Deprecated
 ### Security
 

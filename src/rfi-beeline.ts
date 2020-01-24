@@ -160,7 +160,7 @@ export class RFIBeeline extends Beeline {
     if (this.beeline.withTraceContextFromRequestId) {
       return this.beeline.withTraceContextFromRequestId(this.requestId, fn);
     }
-    return this.beeline.bindFunctionToTrace(fn);
+    return this.beeline.bindFunctionToTrace(fn)();
   }
 }
 
