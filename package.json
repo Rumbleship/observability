@@ -25,7 +25,7 @@
     "coveralls": "^3.0.3",
     "honeycomb-beeline": "git+ssh://git@github.com/rumbleship/beeline-nodejs.git#master",
     "jest": "^24.0.0",
-    "prettier": "^1.14.3",
+    "prettier": "^1.19.1",
     "prettier-tslint": "^0.4.0",
     "reflect-metadata": "^0.1.13",
     "ts-jest": "^24.0.0",
