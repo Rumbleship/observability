@@ -58,14 +58,7 @@ export class RFIBeeline extends Beeline {
   private _beelineImplementation: any;
   constructor(public requestId: string, beelineImplementation?: any) {
     super();
-    // `withTraceContextFromRequestId` is added to the Beeline in our fork to enable tracking
-    // traces across the internal Hapi request bus. However, it is _functionally_ the same as
-    // plain `bindFunctionToTrace`...so just do that.
-    // if (!beelineImplementation.withTraceContextFromRequestId) {
-    //   beelineImplementation.withTraceContextFromRequestId = (_requestId: any, fn: () => any) => {
-    //     return fn();
-    //   };
-    // }
+
     this._beelineImplementation = beelineImplementation;
     Object.entries(this._beelineImplementation).forEach(([k, v]) => {
       // We override the native bindFunctionToTrace, + mirror skipping of native
@@ -155,12 +148,14 @@ export class RFIBeeline extends Beeline {
       }
     });
   }
-
+  // `withTraceContextFromRequestId` is added to the Beeline in our fork to enable tracking
+  // traces across the internal Hapi request bus. However, it is _functionally_ the same as
+  // plain `bindFunctionToTrace`...so just do that.
   bindFunctionToTrace(fn: () => any) {
-    if (this.beeline.withTraceContextFromRequestId) {
-      return this.beeline.withTraceContextFromRequestId(this.requestId, fn);
-    }
-    return this.beeline.bindFunctionToTrace(fn)();
+    return (
+      this.beeline.withTraceContextFromRequestId(this.requestId, fn) ??
+      this.beeline.bindFunctionToTrace(fn)()
+    );
   }
 }
 
