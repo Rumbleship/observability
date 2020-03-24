@@ -1,16 +1,12 @@
-import { HoneycombSpan, Tracker } from './honeycomb.interfaces';
+import { HoneycombSpan } from './honeycomb.interfaces';
 export class RumbleshipBeelineFactory {
   static beeline: any;
-  static tracker?: Tracker;
-  static api?: any;
   static finishersByContextId: Map<string, () => any> = new Map();
   make(request_id: string) {
     return new RumbleshipBeeline(
       request_id,
       RumbleshipBeelineFactory.beeline,
-      RumbleshipBeelineFactory.finishersByContextId,
-      RumbleshipBeelineFactory.api,
-      RumbleshipBeelineFactory.tracker
+      RumbleshipBeelineFactory.finishersByContextId
     );
   }
 }
@@ -19,16 +15,8 @@ export class RumbleshipBeeline {
   constructor(
     private context_id: string,
     private beeline: any,
-    private finishersByContextId: Map<string, () => any>,
-    private _api?: any,
-    private _tracker?: Tracker
+    private finishersByContextId: Map<string, () => any>
   ) {}
-  get api() {
-    return this._api;
-  }
-  get tracker() {
-    return this._tracker;
-  }
   withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T {
     try {
       return this.beeline.withSpan(metadataContext, fn, rollupKey);
@@ -119,7 +107,6 @@ export class RumbleshipBeeline {
   ): T {
     return this.beeline.withTrace(metadataContext, fn, withTraceId, withParentSpanId, withDataset);
   }
-
   finishServiceContextTrace() {
     return this.finishersByContextId.get(this.context_id)!();
   }

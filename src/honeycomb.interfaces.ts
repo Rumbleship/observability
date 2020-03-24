@@ -8,22 +8,6 @@ export interface HoneycombSpan {
   startTime: number; // Date.now()
   startTimeHR: number[]; // process.hrtime()
 }
-export interface Tracker {
-  setTracked(value: any): void;
-  getTracked(): any;
-  deleteTracked(): void;
-  runWithoutTracking<T>(fn: () => T): T;
-  bindFunction<T>(fn: () => T): T;
-  callWithContext<T>(fn: () => T, context: any): T;
-
-  // comment copied from underlying honeycomb tracker lib we're hijacking
-  // -----
-  // below is the portion of the async_hooks api we need.  they shouldn't be called directly
-  // from user code.  They also aren't async safe - if any async code is added to them (like console.log)
-  // we'll blow the stack.
-  init(asyncId: any, type: any, triggerAsyncId: any, _resource: any): void;
-  destroy(asyncId: any): void;
-}
 
 // Extracted from `beeline-nodejs/lib/schema.js`
 export enum HoneycombSchema {

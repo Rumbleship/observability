@@ -1,6 +1,10 @@
 import 'reflect-metadata';
 import { RumbleshipBeeline } from './rumbleship-beeline';
 export function WithSpan(context: object = {}): MethodDecorator {
+  // tslint:disable-next-line: no-console
+  console.warn(
+    '@rumbleship/o11y.WithSpan is now deprecated. Update to @rumbleship/o11y.WithAsyncSpan'
+  );
   return (target: any, propertyName: string | symbol, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
     // NOTE: because the ctx is defined in the framework, this should probably be defined in the framework too
@@ -29,7 +33,16 @@ export function WithSpan(context: object = {}): MethodDecorator {
   };
 }
 
-export function WithAsyncSpan(context: object = {}): MethodDecorator {
+/**
+ *
+ * @param context?: {}  metadata to add to the Honeycomb trace context.
+ * @default context {
+ *                    name: `${class.constructor.name}.${wrappedMethod.name}`
+ *                    parent: `${class.constructor.name}`,
+ *                    method: `${wrappedMethod.name}`
+ *                  }
+ */
+export function AddToTrace(context: object = {}): MethodDecorator {
   return (target: any, propertyName: string | symbol, descriptor: PropertyDescriptor) => {
     if (!(context as any).name) {
       Reflect.set(context, 'name', `${target.constructor.name}.${propertyName.toString()}`);
@@ -37,17 +50,12 @@ export function WithAsyncSpan(context: object = {}): MethodDecorator {
     Reflect.set(context, 'parent', target.constructor.name);
     Reflect.set(context, 'method', propertyName.toString());
     const originalMethod = descriptor.value;
-    // NOTE: because the ctx is defined in the framework, this should probably be defined in the framework too
-    // The framework should dependn on `@rumbleship/o11y` and then export WithSpan? That seems...ugly.
-    // But better than making `@rumbleship/o11y` depend on the framework to get Context type?
     descriptor.value = function(...args: any[]) {
-      // If we're in a SequelizeBaseService vs a RelayService (?)
       const { beeline } = (this as any).ctx || findContextWithBeelineFrom(args) || {};
       if (beeline) {
         const return_type = Reflect.getMetadata('design:returntype', target, propertyName);
         const spanContext = {
           'origin.type': 'decorator',
-          name: originalMethod.name,
           ...context
         };
 
@@ -60,14 +68,19 @@ export function WithAsyncSpan(context: object = {}): MethodDecorator {
           );
         });
       } else {
-        throw new Error('Cannot find GQL service context in the arguments. Make sure to pass it.');
+        throw new Error(
+          `Cannot find an RumbleshipContext. Two solutions: 
+            1. Pass it as an argument,
+            2. Decorate a method of a RumbleshipService that has \`.ctx\` property already assigned`
+        );
       }
     };
   };
 }
 
-// export function AddResultToContext(metadata: object = {}): MethodDecorator {}
-
+// I don't want to introduce a cyclic dependency to `@rumbleship/gql` to be able
+// do this check with a plain `instanceof RumbleshipContext` -- so we check for a feature we know
+// and very much _need_ to be present: the beeline.
 function findContextWithBeelineFrom(args: any[]): { beeline: RumbleshipBeeline } | undefined {
-  return args.find(arg => !!arg.beeline);
+  return args.find(arg => !!(arg.beeline instanceof RumbleshipBeeline));
 }
