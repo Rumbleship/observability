@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
-  * Typesafe `RumbleshipBeeline` (+factory??), enabling tracking of fullly async service contexts
-  * `@AddToTrace` decorator
+  * Typesafe `RumbleshipBeeline` that acts as its own factory, enabling tracking of fullly async service contexts
+  * `@AddToTrace` decorator to bind function calls into the trace
 ### Removed
 ### Changed
   * Updated tslint.json, tsconfig.json, plugins, etc to support nullish coalescing.

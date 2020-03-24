@@ -8,6 +8,21 @@ export interface HoneycombSpan {
     startTime: number;
     startTimeHR: number[];
 }
+export declare enum HoneycombInstrumentations {
+    'http' = "http",
+    'https' = "https",
+    'sequelize' = "sequelize",
+    'bluebird' = "bluebird",
+    'mysql2' = "mysql2",
+    '@hapi/hapi' = "@hapi/hapi"
+}
+export interface HoneycombConfiguration {
+    impl: 'libhoney-event' | 'mock';
+    writeKey: string;
+    dataset: string;
+    serviceName: string;
+    enabledInstrumentations: Array<keyof HoneycombInstrumentations>;
+}
 export declare enum HoneycombSchema {
     EVENT_TYPE = "meta.type",
     NODE_VERSION = "meta.node_version",

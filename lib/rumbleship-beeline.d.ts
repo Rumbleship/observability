@@ -1,14 +1,21 @@
-import { HoneycombSpan } from './honeycomb.interfaces';
-export declare class RumbleshipBeelineFactory {
-    static beeline: any;
-    static finishersByContextId: Map<string, () => any>;
-    make(request_id: string): RumbleshipBeeline;
-}
+import { HoneycombSpan, HoneycombConfiguration } from './honeycomb.interfaces';
 export declare class RumbleshipBeeline {
     private context_id;
-    private beeline;
-    private finishersByContextId;
-    constructor(context_id: string, beeline: any, finishersByContextId: Map<string, () => any>);
+    private static beeline;
+    private static FinishersByContextId;
+    private static initialized;
+    /**
+     * @param configureBeeline `require('honeycomb-beeline')`
+     * @param config configuration to pass directly to the native honeycomb config function
+     */
+    static initialize(configureBeeline: (config: HoneycombConfiguration) => any, config: HoneycombConfiguration): void;
+    /**
+     *
+     * @param context_id The unique id for the context this beeline is operating in.
+     * Likely `service_context_id` or `request_id`
+     */
+    static make(context_id: string): RumbleshipBeeline;
+    constructor(context_id: string);
     withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T;
     withAsyncSpan<T>(this: RumbleshipBeeline, metadata_context: object, fn: (span: HoneycombSpan) => Promise<T> | T): Promise<T>;
     withTrace<T>(metadataContext: object, fn: () => T, withTraceId?: string, withParentSpanId?: string, withDataset?: string): T;

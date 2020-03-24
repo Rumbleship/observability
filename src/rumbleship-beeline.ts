@@ -1,25 +1,40 @@
-import { HoneycombSpan } from './honeycomb.interfaces';
-export class RumbleshipBeelineFactory {
-  static beeline: any;
-  static finishersByContextId: Map<string, () => any> = new Map();
-  make(request_id: string) {
-    return new RumbleshipBeeline(
-      request_id,
-      RumbleshipBeelineFactory.beeline,
-      RumbleshipBeelineFactory.finishersByContextId
-    );
-  }
-}
-
+import { HoneycombSpan, HoneycombConfiguration } from './honeycomb.interfaces';
 export class RumbleshipBeeline {
-  constructor(
-    private context_id: string,
-    private beeline: any,
-    private finishersByContextId: Map<string, () => any>
-  ) {}
+  private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
+  private static FinishersByContextId: Map<string, () => any> = new Map();
+  private static initialized: boolean = false;
+  /**
+   * @param configureBeeline `require('honeycomb-beeline')`
+   * @param config configuration to pass directly to the native honeycomb config function
+   */
+  static initialize(
+    configureBeeline: (config: HoneycombConfiguration) => any,
+    config: HoneycombConfiguration
+  ) {
+    if (this.initialized) {
+      throw new Error('RumbleshipBeeline already initialized as a singleton. Cannot reinitialize');
+    }
+    this.beeline = configureBeeline(config);
+    this.initialized = true;
+  }
+
+  /**
+   *
+   * @param context_id The unique id for the context this beeline is operating in.
+   * Likely `service_context_id` or `request_id`
+   */
+  static make(context_id: string): RumbleshipBeeline {
+    if (!this.initialized) {
+      throw new Error(
+        'Cannot make a RumbleshipBeeline instance without initializing the singleton first'
+      );
+    }
+    return new RumbleshipBeeline(context_id);
+  }
+  constructor(private context_id: string) {}
   withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T {
     try {
-      return this.beeline.withSpan(metadataContext, fn, rollupKey);
+      return RumbleshipBeeline.beeline.withSpan(metadataContext, fn, rollupKey);
     } catch (error) {
       if (error.extensions) {
         for (const [k, v] of Object.entries(error.extensions)) {
@@ -105,10 +120,16 @@ export class RumbleshipBeeline {
     withParentSpanId?: string,
     withDataset?: string
   ): T {
-    return this.beeline.withTrace(metadataContext, fn, withTraceId, withParentSpanId, withDataset);
+    return RumbleshipBeeline.beeline.withTrace(
+      metadataContext,
+      fn,
+      withTraceId,
+      withParentSpanId,
+      withDataset
+    );
   }
   finishServiceContextTrace() {
-    return this.finishersByContextId.get(this.context_id)!();
+    return RumbleshipBeeline.FinishersByContextId.get(this.context_id)!();
   }
   startTrace(
     span_data: object,
@@ -116,46 +137,48 @@ export class RumbleshipBeeline {
     parentSpanId?: string,
     dataset?: string
   ): HoneycombSpan {
-    const trace = this.beeline.startTrace(span_data, traceId, parentSpanId, dataset);
-    const boundFinisher = this.beeline.bindFunctionToTrace(() => this.finishTrace(trace));
-    this.finishersByContextId.set(this.context_id, boundFinisher);
+    const trace = RumbleshipBeeline.beeline.startTrace(span_data, traceId, parentSpanId, dataset);
+    const boundFinisher = RumbleshipBeeline.beeline.bindFunctionToTrace(() =>
+      this.finishTrace(trace)
+    );
+    RumbleshipBeeline.FinishersByContextId.set(this.context_id, boundFinisher);
     return trace;
   }
   finishTrace(span: HoneycombSpan): void {
-    return this.beeline.finishTrace(span);
+    return RumbleshipBeeline.beeline.finishTrace(span);
   }
   startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan {
-    return this.beeline.startSpan(metadataContext, spanId, parentId);
+    return RumbleshipBeeline.beeline.startSpan(metadataContext, spanId, parentId);
   }
   finishSpan(span: HoneycombSpan, rollup?: string): void {
-    return this.beeline.finishSpan(span, rollup);
+    return RumbleshipBeeline.beeline.finishSpan(span, rollup);
   }
   startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
-    return this.beeline.startAsyncSpan(metadataContext, fn);
+    return RumbleshipBeeline.beeline.startAsyncSpan(metadataContext, fn);
   }
   bindFunctionToTrace<T>(fn: () => T): T {
-    if (this.beeline.withTraceContextFromRequestId) {
-      return this.beeline.withTraceContextFromRequestId(this.context_id, fn);
+    if (RumbleshipBeeline.beeline.withTraceContextFromRequestId) {
+      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(this.context_id, fn);
     }
-    return this.beeline.bindFunctionToTrace(fn)();
+    return RumbleshipBeeline.beeline.bindFunctionToTrace(fn)();
   }
   runWithoutTrace<T>(fn: () => T): T {
-    return this.beeline.runWithoutTrace(fn);
+    return RumbleshipBeeline.beeline.runWithoutTrace(fn);
   }
   addContext(context: object): void {
-    return this.beeline.addContext(context);
+    return RumbleshipBeeline.beeline.addContext(context);
   }
   removeContext(context: object): void {
-    return this.beeline.removeContext(context);
+    return RumbleshipBeeline.beeline.removeContext(context);
   }
   marshalTraceContext(context: HoneycombSpan): string {
-    return this.beeline.marshalTraceContext(context);
+    return RumbleshipBeeline.beeline.marshalTraceContext(context);
   }
   unmarshalTraceContext(context_string: string): HoneycombSpan {
-    return this.beeline.unmarshalTraceContext(context_string);
+    return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string);
   }
   getTraceContext(): HoneycombSpan {
-    return this.beeline.getTraceContext();
+    return RumbleshipBeeline.beeline.getTraceContext();
   }
 }
 

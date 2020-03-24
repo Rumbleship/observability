@@ -9,6 +9,24 @@ export interface HoneycombSpan {
   startTimeHR: number[]; // process.hrtime()
 }
 
+export enum HoneycombInstrumentations {
+  'http' = 'http',
+  'https' = 'https',
+  'sequelize' = 'sequelize',
+  'bluebird' = 'bluebird',
+  'mysql2' = 'mysql2',
+  '@hapi/hapi' = '@hapi/hapi'
+}
+
+export interface HoneycombConfiguration {
+  impl: 'libhoney-event' | 'mock';
+  writeKey: string;
+  dataset: string;
+  serviceName: string;
+  enabledInstrumentations: Array<keyof HoneycombInstrumentations>; // string[];
+  // [key in HoneycombInstrumentations]: any;
+}
+
 // Extracted from `beeline-nodejs/lib/schema.js`
 export enum HoneycombSchema {
   EVENT_TYPE = 'meta.type',
