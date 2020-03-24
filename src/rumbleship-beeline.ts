@@ -119,28 +119,20 @@ export class RumbleshipBeeline {
   ): T {
     return this.beeline.withTrace(metadataContext, fn, withTraceId, withParentSpanId, withDataset);
   }
-  startOrResumeServiceContextTrace(
-    service_context_id: string,
+
+  finishServiceContextTrace() {
+    return this.finishersByContextId.get(this.context_id)!();
+  }
+  startTrace(
     span_data: object,
     traceId?: string,
     parentSpanId?: string,
     dataset?: string
-  ) {
-    const trace = this.startTrace(span_data, traceId, parentSpanId, dataset);
-    this.finishersByContextId.set(service_context_id, () => this.finishTrace(trace));
-    return trace;
-  }
-
-  finishServiceContextTrace(service_context_id: string, span: HoneycombSpan) {
-    return this.finishersByContextId.get(service_context_id)!();
-  }
-  startTrace(
-    metadataContext: object,
-    traceId?: string,
-    parentSpanId?: string,
-    dataset?: string
   ): HoneycombSpan {
-    return this.beeline.startTrace(metadataContext, traceId, parentSpanId, dataset);
+    const trace = this.beeline.startTrace(span_data, traceId, parentSpanId, dataset);
+    const boundFinisher = this.beeline.bindFunctionToTrace(() => this.finishTrace(trace));
+    this.finishersByContextId.set(this.context_id, boundFinisher);
+    return trace;
   }
   finishTrace(span: HoneycombSpan): void {
     return this.beeline.finishTrace(span);
