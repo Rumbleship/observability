@@ -2,11 +2,11 @@ import 'reflect-metadata';
 export declare function WithSpan(context?: object): MethodDecorator;
 /**
  *
- * @param context?: {}  metadata to add to the Honeycomb trace context.
+ * @param span_metadata?: {}  metadata to add to the Honeycomb trace context.
  * @default context {
  *                    name: `${class.constructor.name}.${wrappedMethod.name}`
- *                    parent: `${class.constructor.name}`,
+ *                    class: `${class.constructor.name}`,
  *                    method: `${wrappedMethod.name}`
  *                  }
  */
-export declare function AddToTrace(context?: object): MethodDecorator;
+export declare function AddToTrace(span_metadata?: object): MethodDecorator;

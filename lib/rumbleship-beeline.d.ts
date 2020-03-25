@@ -16,11 +16,19 @@ export declare class RumbleshipBeeline {
      */
     static make(context_id: string): RumbleshipBeeline;
     constructor(context_id: string);
+    /**
+     *
+     * See https://docs.honeycomb.io/working-with-your-data/tracing/send-trace-data/#links
+     *
+     * tl;dr: very useful for linking an event-loading-spinner to a brand new trace
+     * that actually processes the events; so we can view how many promise chains fork off
+     * a single spinner
+     */
     linkToSpan(target: HoneycombSpan): void;
     withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T;
     withAsyncSpan<T>(this: RumbleshipBeeline, metadata_context: object, fn: (span: HoneycombSpan) => Promise<T> | T): Promise<T>;
     withTrace<T>(metadataContext: object, fn: () => T, withTraceId?: string, withParentSpanId?: string, withDataset?: string): T;
-    finishServiceContextTrace(): any;
+    finishRumbleshipContextTrace(): any;
     startTrace(span_data: object, traceId?: string, parentSpanId?: string, dataset?: string): HoneycombSpan;
     finishTrace(span: HoneycombSpan): void;
     startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan;

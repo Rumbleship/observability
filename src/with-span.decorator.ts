@@ -35,20 +35,20 @@ export function WithSpan(context: object = {}): MethodDecorator {
 
 /**
  *
- * @param context?: {}  metadata to add to the Honeycomb trace context.
+ * @param span_metadata?: {}  metadata to add to the Honeycomb trace context.
  * @default context {
  *                    name: `${class.constructor.name}.${wrappedMethod.name}`
- *                    parent: `${class.constructor.name}`,
+ *                    class: `${class.constructor.name}`,
  *                    method: `${wrappedMethod.name}`
  *                  }
  */
-export function AddToTrace(context: object = {}): MethodDecorator {
+export function AddToTrace(span_metadata: object = {}): MethodDecorator {
   return (target: any, propertyName: string | symbol, descriptor: PropertyDescriptor) => {
-    if (!(context as any).name) {
-      Reflect.set(context, 'name', `${target.constructor.name}.${propertyName.toString()}`);
+    if (!(span_metadata as any).name) {
+      Reflect.set(span_metadata, 'name', `${target.constructor.name}.${propertyName.toString()}`);
     }
-    Reflect.set(context, 'parent', target.constructor.name);
-    Reflect.set(context, 'method', propertyName.toString());
+    Reflect.set(span_metadata, 'class', target.constructor.name);
+    Reflect.set(span_metadata, 'method', propertyName.toString());
     const originalMethod = descriptor.value;
     descriptor.value = function(...args: any[]) {
       const { beeline } = (this as any).ctx || findContextWithBeelineFrom(args) || {};
@@ -56,7 +56,7 @@ export function AddToTrace(context: object = {}): MethodDecorator {
         const return_type = Reflect.getMetadata('design:returntype', target, propertyName);
         const spanContext = {
           'origin.type': 'decorator',
-          ...context
+          ...span_metadata
         };
 
         const wrapped = () => originalMethod.apply(this, args);

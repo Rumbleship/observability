@@ -145,7 +145,7 @@ export class RumbleshipBeeline {
       withDataset
     );
   }
-  finishServiceContextTrace() {
+  finishRumbleshipContextTrace() {
     return RumbleshipBeeline.FinishersByContextId.get(this.context_id)!();
   }
   startTrace(
