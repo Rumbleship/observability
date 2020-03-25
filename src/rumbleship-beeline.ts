@@ -32,6 +32,14 @@ export class RumbleshipBeeline {
     return new RumbleshipBeeline(context_id);
   }
   constructor(private context_id: string) {}
+  /**
+   *
+   * See https://docs.honeycomb.io/working-with-your-data/tracing/send-trace-data/#links
+   *
+   * tl;dr: very useful for linking an event-loading-spinner to a brand new trace
+   * that actually processes the events; so we can view how many promise chains fork off
+   * a single spinner
+   */
   linkToSpan(target: HoneycombSpan) {
     this.finishSpan(
       this.startSpan({
