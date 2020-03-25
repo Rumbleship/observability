@@ -62,7 +62,7 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
         const wrapped = () => originalMethod.apply(this, args);
 
         return beeline.bindFunctionToTrace(() => {
-          return beeline[return_type?.name === 'Promise' ? 'withAsyncSpan' : 'withSpan'](
+          return beeline[return_type?.name !== 'Promise' ? 'withSpan' : 'withAsyncSpan'](
             spanContext,
             wrapped
           );
