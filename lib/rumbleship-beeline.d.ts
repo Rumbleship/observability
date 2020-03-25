@@ -16,6 +16,7 @@ export declare class RumbleshipBeeline {
      */
     static make(context_id: string): RumbleshipBeeline;
     constructor(context_id: string);
+    linkToSpan(target: HoneycombSpan): void;
     withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T;
     withAsyncSpan<T>(this: RumbleshipBeeline, metadata_context: object, fn: (span: HoneycombSpan) => Promise<T> | T): Promise<T>;
     withTrace<T>(metadataContext: object, fn: () => T, withTraceId?: string, withParentSpanId?: string, withDataset?: string): T;

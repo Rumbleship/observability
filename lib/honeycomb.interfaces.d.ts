@@ -1,28 +1,3 @@
-export interface HoneycombSpan {
-    id: string;
-    customContext?: object;
-    stack: HoneycombSpan[];
-    dataset: string;
-    traceId: string;
-    parentSpanId?: string;
-    startTime: number;
-    startTimeHR: number[];
-}
-export declare enum HoneycombInstrumentations {
-    'http' = "http",
-    'https' = "https",
-    'sequelize' = "sequelize",
-    'bluebird' = "bluebird",
-    'mysql2' = "mysql2",
-    '@hapi/hapi' = "@hapi/hapi"
-}
-export interface HoneycombConfiguration {
-    impl: 'libhoney-event' | 'mock';
-    writeKey: string;
-    dataset: string;
-    serviceName: string;
-    enabledInstrumentations: Array<keyof HoneycombInstrumentations>;
-}
 export declare enum HoneycombSchema {
     EVENT_TYPE = "meta.type",
     NODE_VERSION = "meta.node_version",
@@ -38,5 +13,35 @@ export declare enum HoneycombSchema {
     TRACE_PARENT_ID = "trace.parent_id",
     TRACE_SPAN_ID = "trace.span_id",
     TRACE_SERVICE_NAME = "service_name",
-    TRACE_SPAN_NAME = "name"
+    TRACE_SPAN_NAME = "name",
+    TRACE_LINK_SPAN_ID = "trace.link.span_id",
+    TRACE_LINK_TRACE_ID = "trace.link.trace_id",
+    TRACE_LINK_META = "meta.span_type"
+}
+export interface HoneycombSpan {
+    id: string;
+    customContext?: object;
+    stack: HoneycombSpan[];
+    dataset: string;
+    traceId: string;
+    parentSpanId?: string;
+    startTime: number;
+    startTimeHR: number[];
+    [HoneycombSchema.TRACE_ID]: string;
+    [HoneycombSchema.TRACE_SPAN_ID]: string;
+}
+export declare enum HoneycombInstrumentations {
+    'http' = "http",
+    'https' = "https",
+    'sequelize' = "sequelize",
+    'bluebird' = "bluebird",
+    'mysql2' = "mysql2",
+    '@hapi/hapi' = "@hapi/hapi"
+}
+export interface HoneycombConfiguration {
+    impl: 'libhoney-event' | 'mock';
+    writeKey: string;
+    dataset: string;
+    serviceName: string;
+    enabledInstrumentations: Array<keyof HoneycombInstrumentations>;
 }

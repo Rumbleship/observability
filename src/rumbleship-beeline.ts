@@ -1,4 +1,4 @@
-import { HoneycombSpan, HoneycombConfiguration } from './honeycomb.interfaces';
+import { HoneycombSpan, HoneycombConfiguration, HoneycombSchema } from './honeycomb.interfaces';
 export class RumbleshipBeeline {
   private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
   private static FinishersByContextId: Map<string, () => any> = new Map();
@@ -32,6 +32,15 @@ export class RumbleshipBeeline {
     return new RumbleshipBeeline(context_id);
   }
   constructor(private context_id: string) {}
+  linkToSpan(target: HoneycombSpan) {
+    this.finishSpan(
+      this.startSpan({
+        [HoneycombSchema.TRACE_LINK_TRACE_ID]: target[HoneycombSchema.TRACE_ID],
+        [HoneycombSchema.TRACE_LINK_SPAN_ID]: target[HoneycombSchema.TRACE_SPAN_ID],
+        [HoneycombSchema.TRACE_LINK_META]: 'link'
+      })
+    );
+  }
   withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T {
     try {
       return RumbleshipBeeline.beeline.withSpan(metadataContext, fn, rollupKey);
