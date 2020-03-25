@@ -53,7 +53,6 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
     descriptor.value = function(...args: any[]) {
       const { beeline } = (this as any).ctx || findContextWithBeelineFrom(args) || {};
       if (beeline) {
-        const return_type = Reflect.getMetadata('design:returntype', target, propertyName);
         const spanContext = {
           'origin.type': 'decorator',
           ...span_metadata
@@ -62,10 +61,7 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
         const wrapped = () => originalMethod.apply(this, args);
 
         return beeline.bindFunctionToTrace(() => {
-          return beeline[return_type?.name !== 'Promise' ? 'withSpan' : 'withAsyncSpan'](
-            spanContext,
-            wrapped
-          );
+          return beeline.withAsyncSpan(spanContext, wrapped);
         });
       } else {
         throw new Error(
