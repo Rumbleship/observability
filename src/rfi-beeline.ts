@@ -1,5 +1,13 @@
+/**
+ * THIS VERSION IS DEPRECATED. USE `RumbleshipBeeline` and its associated Factory instead!
+ */
+
+import { HoneycombSpan } from './honeycomb.interfaces';
+
 export class HoneycombBeelineFactory {
   private static globalBeeline: any;
+  private static ServiceRequestIdBeelineMap = new Map<string, RFIBeeline>();
+  // private static tracker: Tracker;
   /**
    * @param config Configuration
    * @param config.writeKey The honeycomb API key
@@ -18,54 +26,86 @@ export class HoneycombBeelineFactory {
     requestId: string,
     beelineImplementation: any = HoneycombBeelineFactory.globalBeeline
   ): RFIBeeline {
-    return new RFIBeeline(requestId, beelineImplementation);
+    const instance =
+      HoneycombBeelineFactory.ServiceRequestIdBeelineMap.get(requestId) ??
+      new RFIBeeline(requestId, beelineImplementation);
+    HoneycombBeelineFactory.ServiceRequestIdBeelineMap.set(requestId, instance);
+    return instance;
+  }
+}
+abstract class Beeline {
+  withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T {
+    throw new Error('missing implementation');
+  }
+  withAsyncSpan<T>(this: Beeline, metadataContext: object, fn: () => T): Promise<T> {
+    throw new Error('missing implementation');
+  }
+  withTrace<T>(
+    metadataContext: object,
+    fn: () => T,
+    withTraceId?: string,
+    withParentSpanId?: string,
+    withDataset?: string
+  ): T {
+    throw new Error('missing implementation');
+  }
+  startTrace(
+    metadataContext: object,
+    traceId?: string,
+    parentSpanId?: string,
+    dataset?: string
+  ): HoneycombSpan {
+    throw new Error('missing implementation');
+  }
+  finishTrace(span: HoneycombSpan): void {
+    throw new Error('missing implementation');
+  }
+  // startAsyncTrace(
+  //   this: Beeline,
+  //   metadataContext: object,
+  //   traceId?: string,
+  //   parentSpanId?: string,
+  //   dataset?: string
+  // ): HoneycombSpan {
+  //   throw new Error('missing implementation');
+  // }
+  startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan {
+    throw new Error('missing implementation');
+  }
+  finishSpan(span: HoneycombSpan, rollup?: string): void {
+    throw new Error('missing implementation');
+  }
+  startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
+    throw new Error('missing implementation');
+  }
+  bindFunctionToTrace<T>(fn: () => T): T {
+    throw new Error('missing implementation');
+  }
+  runWithoutTrace<T>(fn: () => T): T {
+    throw new Error('missing implementation');
+  }
+  addContext(context: object): void {
+    throw new Error('missing implementation');
+  }
+  removeContext(context: object): void {
+    throw new Error('missing implementation');
+  }
+  marshalTraceContext(context: HoneycombSpan): string {
+    throw new Error('missing implementation');
+  }
+  unmarshalTraceContext(context_string: string): HoneycombSpan {
+    throw new Error('missing implementation');
+  }
+  getTraceContext(): HoneycombSpan {
+    throw new Error('missing implementation');
   }
 }
 
-export abstract class Beeline {
-  withSpan(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  withAsyncSpan(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  withTrace(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  startTrace(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  finishTrace(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  startSpan(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  finishSpan(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  startAsyncSpan(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  bindFunctionToTrace(...args: any[]) {
-    throw new Error('missing implementation');
-  }
-  addContext(context: object) {
-    throw new Error('missing implementation');
-  }
-}
 export class RFIBeeline extends Beeline {
   private _beelineImplementation: any;
   constructor(public requestId: string, beelineImplementation?: any) {
     super();
-    // `withTraceContextFromRequestId` is added to the Beeline in our fork to enable tracking
-    // traces across the internal Hapi request bus. However, it is _functionally_ the same as
-    // plain `bindFunctionToTrace`...so just do that.
-    // if (!beelineImplementation.withTraceContextFromRequestId) {
-    //   beelineImplementation.withTraceContextFromRequestId = (_requestId: any, fn: () => any) => {
-    //     return fn();
-    //   };
-    // }
+
     this._beelineImplementation = beelineImplementation;
     Object.entries(this._beelineImplementation).forEach(([k, v]) => {
       // We override the native bindFunctionToTrace, + mirror skipping of native
@@ -80,21 +120,23 @@ export class RFIBeeline extends Beeline {
     return this._beelineImplementation;
   }
 
-  withSpan(...args: any[]) {
+  withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
     try {
-      return super.withSpan(...args);
+      return super.withSpan<T>(metadataContext, fn);
     } catch (error) {
       if (error.extensions) {
         for (const [k, v] of Object.entries(error.extensions)) {
           this.addContext({ [`app.gql.error.extensions.${k}`]: v });
         }
       }
+      // Is this right?
+      throw error;
     }
   }
   // tslint:disable-next-line: ban-types
   withAsyncSpan(this: RFIBeeline, spanData: any, spanFn: Function): Promise<any> {
     return new Promise((resolve, reject) => {
-      const value = (this as any).startAsyncSpan(spanData, (span: any) => {
+      const value = this.startAsyncSpan(spanData, (span: any) => {
         let innerValue;
         try {
           innerValue = spanFn(span);
@@ -155,8 +197,11 @@ export class RFIBeeline extends Beeline {
       }
     });
   }
-
-  bindFunctionToTrace(fn: () => any) {
+  // `withTraceContextFromRequestId` is added to the Beeline in our fork's **HAPI INSTRUMENTATION**
+  // to enable tracking traces across the internal Hapi request bus.
+  // However, it is _functionally_ the same as
+  // plain `bindFunctionToTrace`...so just do that.
+  bindFunctionToTrace<T>(fn: () => T): T {
     if (this.beeline.withTraceContextFromRequestId) {
       return this.beeline.withTraceContextFromRequestId(this.requestId, fn);
     }
