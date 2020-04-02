@@ -34,8 +34,19 @@ export class HoneycombMiddleware implements MiddlewareInterface {
   }
 }
 
-/**
- * check root for span
- * create span with parentid from root span
- * set span on current root
- */
+export class RumbleshipTraceMiddleware implements MiddlewareInterface {
+  use({ root, args, context, info }: ResolverData, next: NextFn) {
+    if (context) {
+      const { beeline } = context as any;
+      // tslint:disable-next-line: only-arrow-functions
+      return beeline.bindFunctionToTrace(function() {
+        return beeline.withAsyncSpan({ name: 'resolve' }, async () => {
+          const result = await next();
+          return result;
+        });
+      });
+    } else {
+      return next();
+    }
+  }
+}
