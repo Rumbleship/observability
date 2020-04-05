@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 ### Removed
 ### Changed
+  * Better interop between Services, Relays and Resolvers for `@AddToTrace()`
 ### Fixed
 ### Deprecated
 ### Security

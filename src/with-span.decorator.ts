@@ -51,7 +51,11 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
     Reflect.set(span_metadata, 'method', propertyName.toString());
     const originalMethod = descriptor.value;
     descriptor.value = function(...args: any[]) {
-      const { beeline } = (this as any).ctx || findContextWithBeelineFrom(args) || {};
+      const { beeline } =
+        (this as any).ctx || // if this is a service
+        (this as any)?._service?.getContext() || // if this is a relay
+        findContextWithBeelineFrom(args) || // if this is a resolver, with @Ctx injected
+        {}; // Fallback through
       if (beeline) {
         const spanContext = {
           'origin.type': 'decorator',
