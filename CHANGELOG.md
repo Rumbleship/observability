@@ -11,7 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 ### Changed
   * Better interop between Services, Relays and Resolvers for `@AddToTrace()`
+  * Exposed `traceActive()`
+  * When `@AddToTrace()`, if there is no active trace, return the unwrapped original implementation
 ### Fixed
+  * bindFunctionToTrace() executes the function returned by hapi instrumentation `withTraceContextFromRequestId()`
 ### Deprecated
 ### Security
 

@@ -41,4 +41,5 @@ export declare class RumbleshipBeeline {
     marshalTraceContext(context: HoneycombSpan): string;
     unmarshalTraceContext(context_string: string): HoneycombSpan;
     getTraceContext(): HoneycombSpan;
+    traceActive(): boolean;
 }

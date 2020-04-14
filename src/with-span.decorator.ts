@@ -57,16 +57,20 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
         findContextWithBeelineFrom(args) || // if this is a resolver, with @Ctx injected
         {}; // Fallback through
       if (beeline) {
-        const spanContext = {
-          'origin.type': 'decorator',
-          ...span_metadata
-        };
+        if (beeline.traceActive()) {
+          const spanContext = {
+            'origin.type': 'decorator',
+            ...span_metadata
+          };
 
-        const wrapped = () => originalMethod.apply(this, args);
+          const wrapped = () => originalMethod.apply(this, args);
 
-        return beeline.bindFunctionToTrace(() => {
-          return beeline.withAsyncSpan(spanContext, wrapped);
-        });
+          return beeline.bindFunctionToTrace(() => {
+            return beeline.withAsyncSpan(spanContext, wrapped);
+          });
+        }
+        console.warn('`AddToTrace` invoked without an active span.');
+        return originalMethod.apply(this, args);
       } else {
         throw new Error(
           `Cannot find an RumbleshipContext. Two solutions: 
