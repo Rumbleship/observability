@@ -31,6 +31,9 @@ export class RumbleshipBeeline {
     }
     return new RumbleshipBeeline(context_id);
   }
+  static flush() {
+    return RumbleshipBeeline.beeline.flush();
+  }
   constructor(private context_id: string) {}
   /**
    *

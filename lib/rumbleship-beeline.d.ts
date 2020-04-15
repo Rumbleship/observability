@@ -15,6 +15,7 @@ export declare class RumbleshipBeeline {
      * Likely `service_context_id` or `request_id`
      */
     static make(context_id: string): RumbleshipBeeline;
+    static flush(): any;
     constructor(context_id: string);
     /**
      *
