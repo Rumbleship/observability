@@ -69,6 +69,7 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
             return beeline.withAsyncSpan(spanContext, wrapped);
           });
         }
+        // tslint:disable-next-line: no-console
         console.warn('`AddToTrace` invoked without an active span.');
         return originalMethod.apply(this, args);
       } else {
