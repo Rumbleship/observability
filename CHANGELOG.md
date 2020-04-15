@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file. Starting wi
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+### Added
+### Removed
+### Changed
+  * Better interop between Services, Relays and Resolvers for `@AddToTrace()`
+  * Exposed `traceActive()`
+  * When `@AddToTrace()`, if there is no active trace, return the unwrapped original implementation
+### Fixed
+  * bindFunctionToTrace() executes the function returned by hapi instrumentation `withTraceContextFromRequestId()`
+### Deprecated
+### Security
+
+
 ## [1.0.0] -- 2020-04-02
 
 ### Added
