@@ -2,9 +2,9 @@ import { NextFn, ResolverData, MiddlewareInterface } from 'type-graphql';
 export class HoneycombMiddleware implements MiddlewareInterface {
   use({ root, args, context, info }: ResolverData, next: NextFn) {
     if (context) {
-      const { rfiBeeline } = context as any;
+      const { beeline } = context as any;
       // tslint:disable-next-line: only-arrow-functions
-      return rfiBeeline.bindFunctionToTrace(function() {
+      return beeline.bindFunctionToTrace(function() {
         const beelineContext = {
           name: 'resolve',
           'app.gql.operation.query': info.operation.operation,
@@ -13,15 +13,15 @@ export class HoneycombMiddleware implements MiddlewareInterface {
         };
 
         for (const [arg, argValue] of Object.entries(args)) {
-          rfiBeeline.beeline.addContext({
+          beeline.addContext({
             [`app.gql.params.${arg}`]: argValue
           });
         }
 
-        return rfiBeeline.withAsyncSpan(beelineContext, async () => {
+        return beeline.withAsyncSpan(beelineContext, async () => {
           const result = await next();
           if (result && result.id) {
-            rfiBeeline.addContext({
+            beeline.addContext({
               'app.relay.node.id': result.id.oid || result.id
             });
           }
