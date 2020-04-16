@@ -20,6 +20,20 @@ export class RumbleshipBeeline {
 
   /**
    *
+   * @param server_like A Hapi.Server that has been instrumented.
+   *
+   * Replaces initial `RumbleshipBeeline` with  the beeline that has been
+   * reconfigured and extended by the `@hapi/hapi` instrumentation so `bindFunctionToTrace()`
+   * picks up the Hapi request context
+   */
+  static shimFromInstrumentation<T>(server_like: T): T {
+    if ((server_like as any).beeline) {
+      this.beeline = (server_like as any).beeline;
+    }
+    return server_like;
+  }
+  /**
+   *
    * @param context_id The unique id for the context this beeline is operating in.
    * Likely `service_context_id` or `request_id`
    */

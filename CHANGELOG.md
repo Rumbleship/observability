@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
   * Expose `flush()` on our static RumbleshipBeeline
+  * RumbleshipBeeline.shimFromInstrumentation() to pull fully Hapi-instrumented beeline back into context factory
 ### Removed
 ### Changed
 ### Fixed
+  * HoneycombMiddleware uses the fully typed RumbleshipBeeline
 ### Deprecated
 ### Security
 
