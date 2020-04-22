@@ -192,9 +192,9 @@ export class RumbleshipBeeline {
   }
   bindFunctionToTrace<T>(fn: () => T): T {
     if (RumbleshipBeeline.beeline.withTraceContextFromRequestId) {
-      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(this.context_id, fn)();
+      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(this.context_id, fn);
     }
-    return RumbleshipBeeline.beeline.bindFunctionToTrace(fn)();
+    return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
   }
   runWithoutTrace<T>(fn: () => T): T {
     return RumbleshipBeeline.beeline.runWithoutTrace(fn);

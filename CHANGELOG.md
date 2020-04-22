@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 ### Changed
 ### Fixed
+  * **BREAKING (subtle) CHANGE** RumbleshipBeeline.bindFunctionToTrace(cb) no longer binds _and executes_ the callback. It only binds its, and returns for invoker to with as they please. 
 ### Deprecated
 ### Security
 
