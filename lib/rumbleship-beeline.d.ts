@@ -2,7 +2,7 @@ import { HoneycombSpan, HoneycombConfiguration } from './honeycomb.interfaces';
 export declare class RumbleshipBeeline {
     private context_id;
     private static beeline;
-    private static FinishersByContextId;
+    static FinishersByContextId: Map<string, () => any>;
     private static initialized;
     /**
      * @param configureBeeline `require('honeycomb-beeline')`
@@ -38,7 +38,7 @@ export declare class RumbleshipBeeline {
     withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T;
     withAsyncSpan<T>(this: RumbleshipBeeline, metadata_context: object, fn: (span: HoneycombSpan) => Promise<T> | T): Promise<T>;
     withTrace<T>(metadataContext: object, fn: () => T, withTraceId?: string, withParentSpanId?: string, withDataset?: string): T;
-    finishRumbleshipContextTrace(): any;
+    finishRumbleshipContextTrace(): void;
     startTrace(span_data: object, traceId?: string, parentSpanId?: string, dataset?: string): HoneycombSpan;
     finishTrace(span: HoneycombSpan): void;
     startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan;

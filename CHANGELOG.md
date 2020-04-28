@@ -10,7 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 ### Removed
 ### Changed
+  * Expose RumbleshipBeeline.FinishersByContextId
 ### Fixed
+  * GQL Middleware now executes the bound function
+  * Delete the finisher from map after it is invoked
 ### Deprecated
 ### Security
 
@@ -49,7 +52,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   * bindFunctionToTrace() executes the function returned by hapi instrumentation `withTraceContextFromRequestId()`
 
 ## [1.0.0] -- 2020-04-02
-
+jq
 ### Added
   * Typesafe `RumbleshipBeeline` that acts as its own factory, enabling tracking of fullly async service contexts
   * `@AddToTrace` decorator to bind function calls into the trace

@@ -1,7 +1,7 @@
 import { HoneycombSpan, HoneycombConfiguration, HoneycombSchema } from './honeycomb.interfaces';
 export class RumbleshipBeeline {
   private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
-  private static FinishersByContextId: Map<string, () => any> = new Map();
+  static FinishersByContextId: Map<string, () => any> = new Map();
   private static initialized: boolean = false;
   /**
    * @param configureBeeline `require('honeycomb-beeline')`
@@ -163,7 +163,11 @@ export class RumbleshipBeeline {
     );
   }
   finishRumbleshipContextTrace() {
-    return RumbleshipBeeline.FinishersByContextId.get(this.context_id)!();
+    const finisher = RumbleshipBeeline.FinishersByContextId.get(this.context_id);
+    if (finisher) {
+      finisher();
+      RumbleshipBeeline.FinishersByContextId.delete(this.context_id);
+    }
   }
   startTrace(
     span_data: object,
