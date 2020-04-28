@@ -28,7 +28,7 @@ export function WithSpan(context: object = {}): MethodDecorator {
           spanContext,
           wrapped
         );
-      });
+      })();
     };
   };
 }
@@ -67,14 +67,14 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
 
           return beeline.bindFunctionToTrace(() => {
             return beeline.withAsyncSpan(spanContext, wrapped);
-          });
+          })();
         }
         // tslint:disable-next-line: no-console
         console.warn('`AddToTrace` invoked without an active span.');
         return originalMethod.apply(this, args);
       } else {
         throw new Error(
-          `Cannot find an RumbleshipContext. Two solutions: 
+          `Cannot find a Beeline from RumbleshipContext. Two solutions: 
             1. Pass it as an argument,
             2. Decorate a method of a RumbleshipService that has \`.ctx\` property already assigned`
         );

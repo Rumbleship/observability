@@ -29,7 +29,7 @@ export const HoneycombMiddleware: MiddlewareFn = (
         }
         return result;
       });
-    });
+    })();
   } else {
     return next();
   }
