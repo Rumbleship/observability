@@ -7,7 +7,7 @@ import {
 export class RumbleshipBeeline {
   private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
   static TrackedContextbyContextId: Map<string, any> = new Map();
-  static HnyTracker: IAsyncTracker; // the async_tracker from deep inside honeycomb-beeline
+  static HnyTracker?: IAsyncTracker; // the async_tracker from deep inside honeycomb-beeline
   private static initialized: boolean = false;
   /**
    * @param configureBeeline `require('honeycomb-beeline')`
@@ -178,7 +178,16 @@ export class RumbleshipBeeline {
     parentSpanId?: string,
     dataset?: string
   ): HoneycombSpan {
-    const trace = RumbleshipBeeline.beeline.startTrace(span_data, traceId, parentSpanId, dataset);
+    const trace = RumbleshipBeeline.beeline.startTrace(
+      {
+        ...span_data,
+        'meta.o11y.hnytracker.size.start': RumbleshipBeeline?.HnyTracker?.tracked.size,
+        'meta.o11y.trackedbycontextid.size.start': RumbleshipBeeline.TrackedContextbyContextId.size
+      },
+      traceId,
+      parentSpanId,
+      dataset
+    );
     RumbleshipBeeline.TrackedContextbyContextId.set(
       this.context_id,
       RumbleshipBeeline.HnyTracker?.getTracked()
@@ -188,10 +197,15 @@ export class RumbleshipBeeline {
   finishTrace(span: HoneycombSpan): void {
     const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(this.context_id);
     if (tracked) {
-      RumbleshipBeeline.HnyTracker.setTracked(tracked);
+      RumbleshipBeeline.HnyTracker?.setTracked(tracked);
     }
+    RumbleshipBeeline.beeline.addContext({
+      'meta.o11y.hnytracker.size.finish': RumbleshipBeeline?.HnyTracker?.tracked.size,
+      'meta.o11y.trackedbycontextid.size.finish': RumbleshipBeeline.TrackedContextbyContextId.size
+    });
     RumbleshipBeeline.beeline.finishTrace(span);
-    RumbleshipBeeline.HnyTracker?.deleteTracked();
+    // beeline.finishTrace() takes care of deleting its own map, but we have to delete from ours.
+    RumbleshipBeeline.TrackedContextbyContextId.delete(this.context_id);
   }
   startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan {
     return RumbleshipBeeline.beeline.startSpan(metadataContext, spanId, parentId);
@@ -205,12 +219,10 @@ export class RumbleshipBeeline {
   bindFunctionToTrace<T>(fn: () => T): () => T {
     const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(this.context_id);
     if (tracked) {
-      RumbleshipBeeline.HnyTracker.setTracked(tracked);
-      try {
-        return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
-      } finally {
-        RumbleshipBeeline.HnyTracker?.deleteTracked();
-      }
+      RumbleshipBeeline.HnyTracker?.setTracked(tracked);
+      return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+      // RumbleshipBeeline.HnyTracker.deleteTracked() is not required as bindFunctionToTrace()
+      // takes care of that for us.
     }
     // I think this case is not actually needed; we completely separate Hapi RequestContext tracking
     // from RumbleshipContext tracking.

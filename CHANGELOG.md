@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
+  * Size counts as metadata whenever starting/finishing a trace
 ### Removed
 ### Changed
 ### Fixed
+  * Nullish coalescing on HnyTracker
+  * Clean up deletion of our manual context tracking
 ### Deprecated
 ### Security
 
