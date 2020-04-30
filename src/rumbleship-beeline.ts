@@ -1,7 +1,13 @@
-import { HoneycombSpan, HoneycombConfiguration, HoneycombSchema } from './honeycomb.interfaces';
+import {
+  HoneycombSpan,
+  HoneycombConfiguration,
+  HoneycombSchema,
+  IAsyncTracker
+} from './honeycomb.interfaces';
 export class RumbleshipBeeline {
   private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
-  static FinishersByContextId: Map<string, () => any> = new Map();
+  static TrackedContextbyContextId: Map<string, any> = new Map();
+  static HnyTracker: IAsyncTracker; // the async_tracker from deep inside honeycomb-beeline
   private static initialized: boolean = false;
   /**
    * @param configureBeeline `require('honeycomb-beeline')`
@@ -29,6 +35,9 @@ export class RumbleshipBeeline {
   static shimFromInstrumentation<T>(server_like: T): T {
     if ((server_like as any).beeline) {
       this.beeline = (server_like as any).beeline;
+    }
+    if ((server_like as any).app.hny) {
+      this.HnyTracker = (server_like as any).app.hny.tracker;
     }
     return server_like;
   }
@@ -162,13 +171,7 @@ export class RumbleshipBeeline {
       withDataset
     );
   }
-  finishRumbleshipContextTrace() {
-    const finisher = RumbleshipBeeline.FinishersByContextId.get(this.context_id);
-    if (finisher) {
-      finisher();
-      RumbleshipBeeline.FinishersByContextId.delete(this.context_id);
-    }
-  }
+
   startTrace(
     span_data: object,
     traceId?: string,
@@ -176,14 +179,19 @@ export class RumbleshipBeeline {
     dataset?: string
   ): HoneycombSpan {
     const trace = RumbleshipBeeline.beeline.startTrace(span_data, traceId, parentSpanId, dataset);
-    const boundFinisher = RumbleshipBeeline.beeline.bindFunctionToTrace(() =>
-      this.finishTrace(trace)
+    RumbleshipBeeline.TrackedContextbyContextId.set(
+      this.context_id,
+      RumbleshipBeeline.HnyTracker?.getTracked()
     );
-    RumbleshipBeeline.FinishersByContextId.set(this.context_id, boundFinisher);
     return trace;
   }
   finishTrace(span: HoneycombSpan): void {
-    return RumbleshipBeeline.beeline.finishTrace(span);
+    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(this.context_id);
+    if (tracked) {
+      RumbleshipBeeline.HnyTracker.setTracked(tracked);
+    }
+    RumbleshipBeeline.beeline.finishTrace(span);
+    RumbleshipBeeline.HnyTracker?.deleteTracked();
   }
   startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan {
     return RumbleshipBeeline.beeline.startSpan(metadataContext, spanId, parentId);
@@ -194,11 +202,23 @@ export class RumbleshipBeeline {
   startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
     return RumbleshipBeeline.beeline.startAsyncSpan(metadataContext, fn);
   }
-  bindFunctionToTrace<T>(fn: () => T): T {
-    if (RumbleshipBeeline.beeline.withTraceContextFromRequestId) {
-      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(this.context_id, fn);
+  bindFunctionToTrace<T>(fn: () => T): () => T {
+    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(this.context_id);
+    if (tracked) {
+      RumbleshipBeeline.HnyTracker.setTracked(tracked);
+      try {
+        return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+      } finally {
+        RumbleshipBeeline.HnyTracker?.deleteTracked();
+      }
     }
-    return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+    // I think this case is not actually needed; we completely separate Hapi RequestContext tracking
+    // from RumbleshipContext tracking.
+    else if (RumbleshipBeeline.beeline.withTraceContextFromRequestId) {
+      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(this.context_id, fn);
+    } else {
+      return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+    }
   }
   runWithoutTrace<T>(fn: () => T): T {
     return RumbleshipBeeline.beeline.runWithoutTrace(fn);
@@ -212,8 +232,13 @@ export class RumbleshipBeeline {
   marshalTraceContext(context: HoneycombSpan): string {
     return RumbleshipBeeline.beeline.marshalTraceContext(context);
   }
-  unmarshalTraceContext(context_string: string): HoneycombSpan {
-    return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string);
+  /**
+   *
+   * @param context_string The wrapped beeline expects a string, even if it is empty. We accept
+   * undefined because that's more typesafe and cast to the empty string.
+   */
+  unmarshalTraceContext(context_string?: string): HoneycombSpan | object {
+    return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string ?? '') ?? {};
   }
   getTraceContext(): HoneycombSpan {
     return RumbleshipBeeline.beeline.getTraceContext();

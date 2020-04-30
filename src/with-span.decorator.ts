@@ -51,7 +51,7 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
     Reflect.set(span_metadata, 'method', propertyName.toString());
     const originalMethod = descriptor.value;
     descriptor.value = function(...args: any[]) {
-      const { beeline } =
+      const { beeline, id } =
         (this as any).ctx || // if this is a service
         (this as any)?._service?.getContext() || // if this is a relay
         findContextWithBeelineFrom(args) || // if this is a resolver, with @Ctx injected
@@ -64,13 +64,19 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
           };
 
           const wrapped = () => originalMethod.apply(this, args);
-
-          return beeline.bindFunctionToTrace(() => {
-            return beeline.withAsyncSpan(spanContext, wrapped);
-          })();
+          const context = RumbleshipBeeline.TrackedContextbyContextId.get(id);
+          RumbleshipBeeline.HnyTracker.setTracked(context);
+          try {
+            return beeline.bindFunctionToTrace(async () => {
+              const res = await beeline.withAsyncSpan(spanContext, wrapped);
+              return res;
+            })();
+          } finally {
+            RumbleshipBeeline.HnyTracker.deleteTracked();
+          }
         }
         // tslint:disable-next-line: no-console
-        console.warn('`AddToTrace` invoked without an active span.');
+        console.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
         return originalMethod.apply(this, args);
       } else {
         throw new Error(

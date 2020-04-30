@@ -51,3 +51,21 @@ export interface HoneycombConfiguration {
   enabledInstrumentations: Array<keyof HoneycombInstrumentations>; // string[];
   // [key in HoneycombInstrumentations]: any;
 }
+
+// tslint:disable-next-line: interface-name
+export interface IAsyncTracker {
+  tracked: Map<any, any>;
+
+  setTracked: (value: HoneycombSpan) => void;
+  getTracked: () => HoneycombSpan;
+  deleteTracked: () => void;
+  runWithoutTracking<T>(arg0: () => T): T;
+  bindFunction<T>(arg0: () => T): T;
+  // XXX(toshok) this feels wrong, but maybe not?
+  callWithContext<T>(arg0: () => T, context: HoneycombSpan): T;
+  // below is the portion of the async_hooks api we need.  they shouldn't be called directly
+  // from user code.  They also aren't async safe - if any async code is added to them (like console.log)
+  // we'll blow the stack.
+  init(asyncId: number, type: string, triggerAsyncId: number, resource: object): void;
+  destroy(asyncId: number): void;
+}
