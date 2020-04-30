@@ -8,12 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
+  * Enable RumbleshipContext-specific tracking by directly interfacing with native Honeycomb Tracker to enable
 ### Removed
+  * Map of finishers + extra fn to use it, in favor just using HnyTracker directly
 ### Changed
   * Expose RumbleshipBeeline.FinishersByContextId
+  * unmarshalTraceContext() accepts `string|undefined`; casts to `''` when passing to wrapped beeline
 ### Fixed
   * GQL Middleware now executes the bound function
   * Delete the finisher from map after it is invoked
+  * Typings on `bindFunctionToTrace()`
 ### Deprecated
 ### Security
 

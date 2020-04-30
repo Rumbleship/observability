@@ -5,8 +5,7 @@ export const HoneycombMiddleware: MiddlewareFn = (
 ) => {
   if (context) {
     const { beeline } = context as any;
-    // tslint:disable-next-line: only-arrow-functions
-    return beeline.bindFunctionToTrace(function() {
+    return beeline.bindFunctionToTrace(() => {
       const beelineContext = {
         name: 'resolve',
         'app.gql.operation.query': info.operation.operation,
@@ -19,8 +18,7 @@ export const HoneycombMiddleware: MiddlewareFn = (
           [`app.gql.params.${arg}`]: argValue
         });
       }
-      // tslint:disable-next-line: only-arrow-functions
-      return beeline.withAsyncSpan(beelineContext, async function() {
+      return beeline.withAsyncSpan(beelineContext, async () => {
         const result = await next();
         if (result && result.id) {
           beeline.addContext({
