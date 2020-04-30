@@ -66,6 +66,6 @@ export interface IAsyncTracker {
   // below is the portion of the async_hooks api we need.  they shouldn't be called directly
   // from user code.  They also aren't async safe - if any async code is added to them (like console.log)
   // we'll blow the stack.
-  init(asyncId: number, type: string, triggerAsyncId: number, resource: Object): void;
+  init(asyncId: number, type: string, triggerAsyncId: number, resource: object): void;
   destroy(asyncId: number): void;
 }
