@@ -53,6 +53,6 @@ export interface IAsyncTracker {
     runWithoutTracking<T>(arg0: () => T): T;
     bindFunction<T>(arg0: () => T): T;
     callWithContext<T>(arg0: () => T, context: HoneycombSpan): T;
-    init(asyncId: number, type: string, triggerAsyncId: number, resource: Object): void;
+    init(asyncId: number, type: string, triggerAsyncId: number, resource: object): void;
     destroy(asyncId: number): void;
 }
