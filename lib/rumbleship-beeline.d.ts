@@ -3,7 +3,7 @@ export declare class RumbleshipBeeline {
     private context_id;
     private static beeline;
     static TrackedContextbyContextId: Map<string, any>;
-    static HnyTracker: IAsyncTracker;
+    static HnyTracker?: IAsyncTracker;
     private static initialized;
     /**
      * @param configureBeeline `require('honeycomb-beeline')`
