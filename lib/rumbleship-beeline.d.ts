@@ -1,10 +1,9 @@
-import { HoneycombSpan, HoneycombConfiguration } from './honeycomb.interfaces';
+import { HoneycombSpan, HoneycombConfiguration, IAsyncTracker } from './honeycomb.interfaces';
 export declare class RumbleshipBeeline {
     private context_id;
     private static beeline;
-    static FinishersByContextId: Map<string, () => any>;
     static TrackedContextbyContextId: Map<string, any>;
-    static HnyTracker: any;
+    static HnyTracker: IAsyncTracker;
     private static initialized;
     /**
      * @param configureBeeline `require('honeycomb-beeline')`

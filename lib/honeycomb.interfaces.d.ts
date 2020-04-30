@@ -45,3 +45,14 @@ export interface HoneycombConfiguration {
     serviceName: string;
     enabledInstrumentations: Array<keyof HoneycombInstrumentations>;
 }
+export interface IAsyncTracker {
+    tracked: Map<any, any>;
+    setTracked: (value: HoneycombSpan) => void;
+    getTracked: () => HoneycombSpan;
+    deleteTracked: () => void;
+    runWithoutTracking<T>(arg0: () => T): T;
+    bindFunction<T>(arg0: () => T): T;
+    callWithContext<T>(arg0: () => T, context: HoneycombSpan): T;
+    init(asyncId: number, type: string, triggerAsyncId: number, resource: Object): void;
+    destroy(asyncId: number): void;
+}

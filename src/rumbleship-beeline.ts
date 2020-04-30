@@ -6,7 +6,7 @@ import {
 } from './honeycomb.interfaces';
 export class RumbleshipBeeline {
   private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
-  private static TrackedContextbyContextId: Map<string, any> = new Map();
+  static TrackedContextbyContextId: Map<string, any> = new Map();
   static HnyTracker: IAsyncTracker; // the async_tracker from deep inside honeycomb-beeline
   private static initialized: boolean = false;
   /**

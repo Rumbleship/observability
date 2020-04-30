@@ -15,12 +15,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   * Expose RumbleshipBeeline.FinishersByContextId
   * unmarshalTraceContext() accepts `string|undefined`; casts to `''` when passing to wrapped beeline
 ### Fixed
-  * GQL Middleware now executes the bound function
-  * Delete the finisher from map after it is invoked
   * Typings on `bindFunctionToTrace()`
 ### Deprecated
 ### Security
 
+
+## [2.0.1] -- 2020-04-28
+
+### Changed
+  * Expose RumbleshipBeeline.FinishersByContextId
+### Fixed
+  * GQL Middleware now executes the bound function
+  * Delete the finisher from map after it is invoked
 
 ## [2.0.0] -- 2020-04-22
 
