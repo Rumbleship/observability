@@ -65,15 +65,12 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
 
           const wrapped = () => originalMethod.apply(this, args);
           const context = RumbleshipBeeline.TrackedContextbyContextId.get(id);
-          RumbleshipBeeline.HnyTracker.setTracked(context);
-          try {
-            return beeline.bindFunctionToTrace(async () => {
-              const res = await beeline.withAsyncSpan(spanContext, wrapped);
-              return res;
-            })();
-          } finally {
-            RumbleshipBeeline.HnyTracker.deleteTracked();
-          }
+          RumbleshipBeeline.HnyTracker?.setTracked(context);
+          // We don't need to manually delete this setTracked() since bindFunction...does that.
+          return beeline.bindFunctionToTrace(async () => {
+            const res = await beeline.withAsyncSpan(spanContext, wrapped);
+            return res;
+          })();
         }
         // tslint:disable-next-line: no-console
         console.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
