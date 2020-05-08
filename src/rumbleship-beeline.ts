@@ -88,6 +88,15 @@ export class RumbleshipBeeline {
       throw error;
     }
   }
+  /**
+   *
+   * @param this
+   * @param metadata_context
+   * @param fn
+   *
+   * @NOTE You 99.99% want the fn to be `async` and await its result before returning.
+   *  If you don't, the wrapped cb is finished outside of context and trace is lost.
+   */
   withAsyncSpan<T>(
     this: RumbleshipBeeline,
     metadata_context: object,
