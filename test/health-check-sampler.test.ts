@@ -13,7 +13,7 @@ describe('Given a sample rate set to reject all events', () => {
   test('HealthCheckRouteSampler only tries to sample events whose path matches', () => {
     const sampler = new HealthCheckRouteSampler(sample_rate);
     const matchingEvent = () => ({
-      'route.path': '/_ah/health',
+      'app.route.path': '/_ah/health',
       [HoneycombSchema.TRACE_ID]: v4()
     });
     const unmatchingEvent = () => ({

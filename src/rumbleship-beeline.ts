@@ -246,8 +246,20 @@ export class RumbleshipBeeline {
   runWithoutTrace<T>(fn: () => T): T {
     return RumbleshipBeeline.beeline.runWithoutTrace(fn);
   }
+  /**
+   *
+   * @param context Add keys+values of an object to JUST the current span
+   */
   addContext(context: object): void {
     return RumbleshipBeeline.beeline.addContext(context);
+  }
+  /**
+   *
+   * @param context Add keys+values of object to the current span AND ALL CHILD SPANS
+   *  Keys are automatically prefixed with `app.`
+   */
+  addTraceContext(context: object): void {
+    return RumbleshipBeeline.beeline.addTraceContext(context);
   }
   removeContext(context: object): void {
     return RumbleshipBeeline.beeline.removeContext(context);

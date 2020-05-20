@@ -55,7 +55,17 @@ export declare class RumbleshipBeeline {
     startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T;
     bindFunctionToTrace<T>(fn: () => T): () => T;
     runWithoutTrace<T>(fn: () => T): T;
+    /**
+     *
+     * @param context Add keys+values of an object to JUST the current span
+     */
     addContext(context: object): void;
+    /**
+     *
+     * @param context Add keys+values of object to the current span AND ALL CHILD SPANS
+     *  Keys are automatically prefixed with `app.`
+     */
+    addTraceContext(context: object): void;
     removeContext(context: object): void;
     marshalTraceContext(context: HoneycombSpan): string;
     /**
