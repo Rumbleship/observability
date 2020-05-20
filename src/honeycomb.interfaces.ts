@@ -1,3 +1,9 @@
+export interface SamplerResponse {
+  shouldSample: boolean;
+  sampleRate?: number;
+}
+export type SamplerFn = (event: object) => SamplerResponse;
+
 // Extracted from `beeline-nodejs/lib/schema.js`
 export enum HoneycombSchema {
   EVENT_TYPE = 'meta.type',
@@ -48,6 +54,7 @@ export interface HoneycombConfiguration {
   writeKey: string;
   dataset: string;
   serviceName: string;
+  samplerHook: (event: HoneycombSpan) => SamplerResponse;
   enabledInstrumentations: Array<keyof HoneycombInstrumentations>; // string[];
   // [key in HoneycombInstrumentations]: any;
 }
