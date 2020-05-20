@@ -18,7 +18,7 @@ describe('Given a sample rate set to reject all events', () => {
   test('HealthCheckRouteSampler only tries to sample events whose path matches', () => {
     const sampler = new HealthCheckRouteSampler(sample_rate);
     const matchingEvent = () => ({
-      'app.route.path': '/_ah/health',
+      'app.request.path': '/_ah/health',
       [HoneycombSchema.TRACE_ID]: v4()
     });
     const unmatchingEvent = () => ({
@@ -66,7 +66,7 @@ describe('Given a sample rate set to reject all events', () => {
   test('RootRouteSampler only tries to sample events whose path matches', () => {
     const sampler = new RootRouteSampler(sample_rate);
     const matchingEvent = () => ({
-      'app.route.path': '/',
+      'app.request.path': '/',
       [HoneycombSchema.TRACE_ID]: v4()
     });
     const unmatchingEvent = () => ({

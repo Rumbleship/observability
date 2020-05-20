@@ -19,7 +19,7 @@ export class RootRouteSampler extends DeterministicSampler implements TargettedS
    * otherwise, return sampled, but without a rate
    */
   sample(event_data: object) {
-    const route_path = Reflect.get(event_data, 'app.route.path');
+    const route_path = Reflect.get(event_data, 'app.request.path');
     if (route_path === '/') {
       return { ...super.sample(event_data), matched: true };
     }
