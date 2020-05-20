@@ -1,4 +1,4 @@
-import { HealthCheckRouteSampler, HealthCheckQuerySampler } from './samplers/health_check';
+import { HealthCheckRouteSampler, HealthCheckQuerySampler } from './samplers/health-check';
 import { SamplerResponse } from './honeycomb.interfaces';
 import { TargettedSampler, Sampler } from './samplers/deterministic-sampler';
 

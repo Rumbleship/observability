@@ -1,13 +1,14 @@
-import { HealthCheckRouteSampler, HealthCheckQuerySampler } from './samplers/health_check';
 import { SamplerResponse } from './honeycomb.interfaces';
+import { TargettedSampler, Sampler } from './samplers/deterministic-sampler';
 export declare class SamplerPipeline {
-    protected samplers: (HealthCheckRouteSampler | HealthCheckQuerySampler)[];
-    constructor(samplers?: (HealthCheckRouteSampler | HealthCheckQuerySampler)[]);
+    protected targetted_samplers: TargettedSampler[];
+    protected global_sampler?: Sampler | undefined;
+    constructor(targetted_samplers?: TargettedSampler[], global_sampler?: Sampler | undefined);
     /**
      *
      * @param data
      *
-     * @returns SamplerResponse: from the first sampler to return { shouldSample:true }
+     * @returns SamplerResponse: from the first matched sampler to return { shouldSample:true }
      *  otherwise return {shouldSample: false }
      */
     sample(data: object): SamplerResponse;

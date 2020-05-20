@@ -1,6 +1,6 @@
 export interface SamplerResponse {
     shouldSample: boolean;
-    sampleRate: number;
+    sampleRate?: number;
 }
 export declare type SamplerFn = (event: object) => SamplerResponse;
 export declare enum HoneycombSchema {
