@@ -4,6 +4,7 @@ import {
   HoneycombSchema,
   IAsyncTracker
 } from './honeycomb.interfaces';
+import { SamplerPipeline } from './sampler-pipeline';
 export class RumbleshipBeeline {
   private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
   static TrackedContextbyContextId: Map<string, any> = new Map();
@@ -20,7 +21,8 @@ export class RumbleshipBeeline {
     if (this.initialized) {
       throw new Error('RumbleshipBeeline already initialized as a singleton. Cannot reinitialize');
     }
-    this.beeline = configureBeeline(config);
+    const sampler = new SamplerPipeline();
+    this.beeline = configureBeeline({ samplerHook: sampler.sample, ...config });
     this.initialized = true;
   }
 

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
+  * Samplers, defaults to stripping 99/100 events that match the health check `route.path` or `db.query`.
 ### Removed
 ### Changed
 ### Fixed
