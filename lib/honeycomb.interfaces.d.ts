@@ -1,3 +1,8 @@
+export interface SamplerResponse {
+    shouldSample: boolean;
+    sampleRate?: number;
+}
+export declare type SamplerFn = (event: object) => SamplerResponse;
 export declare enum HoneycombSchema {
     EVENT_TYPE = "meta.type",
     NODE_VERSION = "meta.node_version",
@@ -43,6 +48,7 @@ export interface HoneycombConfiguration {
     writeKey: string;
     dataset: string;
     serviceName: string;
+    samplerHook: (event: HoneycombSpan) => SamplerResponse;
     enabledInstrumentations: Array<keyof HoneycombInstrumentations>;
 }
 export interface IAsyncTracker {

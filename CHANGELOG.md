@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
+  * Samplers, defaults to stripping 99/100 events that match the health check `/_ah/health` or root `/` routes
+  * starting a trace adds the GAE_VERSION to root span
 ### Removed
 ### Changed
+  * `withAsyncSpan` and `withSpan` use `addTraceContext()` instead of `addContext()` so errors propagate to children
 ### Fixed
 ### Deprecated
 ### Security
