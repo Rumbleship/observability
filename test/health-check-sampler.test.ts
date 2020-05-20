@@ -11,6 +11,7 @@ test('HealthCheckRouteSampler only samples events whose path matches', () => {
   const sampler = new HealthCheckRouteSampler(1);
   const matchingEvent = () => ({
     'route.path': '/_ah/health',
+    'response.status_code': 200,
     [HoneycombSchema.TRACE_ID]: v4()
   });
   const unmatchingEvent = () => ({
