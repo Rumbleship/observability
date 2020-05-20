@@ -58,6 +58,7 @@ export declare class RumbleshipBeeline {
     /**
      *
      * @param context Add keys+values of an object to JUST the current span
+     * @note you probably want `addTraceContext()` to propagate your metadata to all children.
      */
     addContext(context: object): void;
     /**
