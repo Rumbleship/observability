@@ -1,9 +1,14 @@
 import { v4 } from 'uuid';
 import { SamplerPipeline } from '../src/sampler-pipeline';
-import { DeterministicSampler } from '../src/samplers/deterministic-sampler';
+import { DeterministicSampler, MatchBypass } from '../src/samplers/deterministic-sampler';
 import { HoneycombSchema } from '../src';
 
 class DeterministicMatchedSampler extends DeterministicSampler {
+  match_bypass: MatchBypass = {
+    shouldSample: true,
+    sampleRate: undefined,
+    matched: false
+  };
   constructor(protected sample_rate: number, protected match_against: string) {
     super(sample_rate);
   }
@@ -60,9 +65,9 @@ describe('Given: a pipeline where every TargettedSampler returns shouldSample:fa
   describe('And: no generic sampler', () => {
     describe('When: none of the members matched', () => {
       const sampler = new SamplerPipeline([send_nothing, send_nothing]);
-      test('Then: the event is not sent', () => {
+      test('Then: the event is sent', () => {
         const response = sampler.sample(event_data('no_match'));
-        expect(response.shouldSample).toBe(false);
+        expect(response.shouldSample).toBe(true);
         expect(response.sampleRate).toBe(undefined);
       });
     });
@@ -70,7 +75,7 @@ describe('Given: a pipeline where every TargettedSampler returns shouldSample:fa
   describe('And: a generic sampler that always samples', () => {
     const sampler = new SamplerPipeline([send_nothing, send_nothing], send_everything);
     test('Then: an event is sent', () => {
-      const response = sampler.sample(event_data('no_match'));
+      const response = sampler.sample(event_data('everything'));
       expect(response.shouldSample).toBe(true);
       expect(response.sampleRate).toBe(1);
     });

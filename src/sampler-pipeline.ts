@@ -30,7 +30,7 @@ export class SamplerPipeline {
     if (targetted_sampler_results.length) {
       return targetted_sampler_results[0];
     } else {
-      return this.global_sampler?.sample(data) ?? { shouldSample: false };
+      return this.global_sampler?.sample(data) ?? { shouldSample: true };
     }
   }
 }
