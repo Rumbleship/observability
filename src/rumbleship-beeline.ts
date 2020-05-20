@@ -83,7 +83,7 @@ export class RumbleshipBeeline {
     } catch (error) {
       if (error.extensions) {
         for (const [k, v] of Object.entries(error.extensions)) {
-          this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+          this.addTraceContext({ [`gql.error.extensions.${k}`]: v });
         }
       }
       // Is this right?
@@ -111,7 +111,7 @@ export class RumbleshipBeeline {
           innerValue = fn(span);
         } catch (error) {
           // catch errors here and update the span
-          this.addContext({
+          this.addTraceContext({
             error: `${error}`,
             'error.message': error.message,
             'error.stack': error.stack
@@ -119,7 +119,7 @@ export class RumbleshipBeeline {
 
           if (error.extensions) {
             for (const [k, v] of Object.entries(error.extensions)) {
-              this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+              this.addTraceContext({ [`gql.error.extensions.${k}`]: v });
             }
           }
 
@@ -139,14 +139,16 @@ export class RumbleshipBeeline {
           (innerValue as Promise<T>)
             .catch((error: Error) => {
               // catch errors here and update the span
-              this.addContext({
+              this.addTraceContext({
                 error: `${error}`,
                 'error.message': error.message,
                 'error.stack': error.stack
               });
               if ((error as any).extensions) {
                 for (const [k, v] of Object.entries((error as any).extensions)) {
-                  this.addContext({ [`app.gql.error.extensions.${k}`]: v });
+                  this.addTraceContext({
+                    [`gql.error.extensions.${k}`]: v
+                  });
                 }
               }
               throw error;
@@ -199,6 +201,7 @@ export class RumbleshipBeeline {
       parentSpanId,
       dataset
     );
+    this.addContext({ gae_version: process.env.GAE_VERSION });
     RumbleshipBeeline.TrackedContextbyContextId.set(
       this.context_id,
       RumbleshipBeeline.HnyTracker?.getTracked()
@@ -249,6 +252,7 @@ export class RumbleshipBeeline {
   /**
    *
    * @param context Add keys+values of an object to JUST the current span
+   * @note you probably want `addTraceContext()` to propagate your metadata to all children.
    */
   addContext(context: object): void {
     return RumbleshipBeeline.beeline.addContext(context);
