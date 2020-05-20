@@ -5,18 +5,13 @@ All notable changes to this project will be documented in this file. Starting wi
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [3.1.0] -- 2020-05-20
 
 ### Added
   * Samplers, defaults to stripping 99/100 events that match the health check `/_ah/health` or root `/` routes
   * starting a trace adds the GAE_VERSION to root span
-### Removed
 ### Changed
   * `withAsyncSpan` and `withSpan` use `addTraceContext()` instead of `addContext()` so errors propagate to children
-### Fixed
-### Deprecated
-### Security
-
 
 ## [3.0.1] -- 2020-04-30
 
