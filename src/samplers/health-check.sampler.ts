@@ -1,4 +1,4 @@
-import { DeterministicSampler, TargettedSampler, MatchBypass } from './deterministic-sampler';
+import { DeterministicSampler, TargettedSampler, MatchBypass } from './deterministic.sampler';
 
 export class HealthCheckRouteSampler extends DeterministicSampler implements TargettedSampler {
   match_bypass: MatchBypass = {

@@ -1,12 +1,13 @@
-import { HealthCheckRouteSampler } from './samplers/health-check';
+import { HealthCheckRouteSampler } from './samplers/health-check.sampler';
+import { RootRouteSampler } from './samplers/root-route.sampler';
 import { SamplerResponse } from './honeycomb.interfaces';
-import { TargettedSampler, Sampler } from './samplers/deterministic-sampler';
+import { TargettedSampler, Sampler } from './samplers/deterministic.sampler';
 
 export class SamplerPipeline {
   constructor(
     protected targetted_samplers: TargettedSampler[] = [
-      new HealthCheckRouteSampler()
-      // new HealthCheckQuerySampler()
+      new HealthCheckRouteSampler(),
+      new RootRouteSampler()
     ],
     protected global_sampler?: Sampler
   ) {

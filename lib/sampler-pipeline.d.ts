@@ -1,5 +1,5 @@
 import { SamplerResponse } from './honeycomb.interfaces';
-import { TargettedSampler, Sampler } from './samplers/deterministic-sampler';
+import { TargettedSampler, Sampler } from './samplers/deterministic.sampler';
 export declare class SamplerPipeline {
     protected targetted_samplers: TargettedSampler[];
     protected global_sampler?: Sampler | undefined;

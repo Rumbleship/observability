@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 import { SamplerPipeline } from '../src/sampler-pipeline';
-import { DeterministicSampler, MatchBypass } from '../src/samplers/deterministic-sampler';
+import { DeterministicSampler, MatchBypass } from '../src/samplers/deterministic.sampler';
 import { HoneycombSchema } from '../src';
 
 class DeterministicMatchedSampler extends DeterministicSampler {
