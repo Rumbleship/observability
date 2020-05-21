@@ -1,1 +1,1 @@
-{"version":3,"file":"health-check.sampler.js","sourceRoot":"","sources":["../../src/samplers/health-check.sampler.ts"],"names":[],"mappings":";;AAAA,mDAA+C;AAE/C,MAAa,uBAAwB,SAAQ,4BAAY;IACvD,YAAY,cAAkC,GAAG;QAC/C,KAAK,CAAC,gBAAgB,EAAE,WAAW,CAAC,CAAC;IACvC,CAAC;CACF;AAJD,0DAIC"}
+{"version":3,"file":"health-check.sampler.js","sourceRoot":"","sources":["../../src/samplers/health-check.sampler.ts"],"names":[],"mappings":";;AAAA,mDAA+C;AAE/C,MAAa,uBAAwB,SAAQ,4BAAY;IACvD,YAAY,cAAkC,GAAG;QAC/C,KAAK,CAAC,iBAAiB,EAAE,WAAW,CAAC,CAAC;IACxC,CAAC;CACF;AAJD,0DAIC"}
