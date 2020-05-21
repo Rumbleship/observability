@@ -3,3 +3,8 @@ export * from './gql/honeycomb.middleware';
 export * from './with-span.decorator';
 export * from './rumbleship-beeline';
 export * from './honeycomb.interfaces';
+export * from './sampler-pipeline';
+export * from './samplers/deterministic.sampler';
+export * from './samplers/health-check.sampler';
+export * from './samplers/root-route.sampler';
+export * from './samplers/route.sampler';
