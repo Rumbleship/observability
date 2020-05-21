@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 ### Removed
+  * HealthCheckQuerySampler
 ### Changed
+  * RouteSamplers only consider the root event of matching traces, and completely ignore any child events.
 ### Fixed
 ### Deprecated
 ### Security
