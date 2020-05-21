@@ -98,3 +98,35 @@ describe('RouteSampler only sends the root event', () => {
     expect(rates.ignored).toBeGreaterThan(rates.sampled);
   });
 });
+
+test('RootRoute sampler is anchored to only exact match', () => {
+  const sampler = new RootRouteSampler();
+  expect(
+    sampler.sample({
+      'app.request.path': '/',
+      [HoneycombSchema.TRACE_ID]: v4()
+    }).matched
+  ).toBeTruthy();
+  expect(
+    sampler.sample({
+      'app.request.path': '/foo',
+      [HoneycombSchema.TRACE_ID]: v4()
+    }).matched
+  ).toBeFalsy();
+});
+
+test('HealthCheck sampler is anchored to only exact match', () => {
+  const sampler = new HealthCheckRouteSampler();
+  expect(
+    sampler.sample({
+      'app.request.path': '/_ah/health',
+      [HoneycombSchema.TRACE_ID]: v4()
+    }).matched
+  ).toBeTruthy();
+  expect(
+    sampler.sample({
+      'app.request.path': '/_ah/health/foo',
+      [HoneycombSchema.TRACE_ID]: v4()
+    }).matched
+  ).toBeFalsy();
+});
