@@ -5,17 +5,11 @@ All notable changes to this project will be documented in this file. Starting wi
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [3.1.4] -- 2020-05-27
 
 ### Added
   * Add GAE ENV_VARs to trace context when starting a trace via this lib
   * Add helper to extract and set GAE ENV_VARs when starting a trace elsewhere (e.g. 'natively' from hapi instrumentation)
-### Removed
-### Changed
-### Fixed
-### Deprecated
-### Security
-
 
 ## [3.1.3] -- 2020-05-21
 
