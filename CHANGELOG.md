@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
-  * Add GAE ENV_VARs to trace context when starting a trace
+  * Add GAE ENV_VARs to trace context when starting a trace via this lib
+  * Add helper to extract and set GAE ENV_VARs when starting a trace elsewhere (e.g. 'natively' from hapi instrumentation)
 ### Removed
 ### Changed
 ### Fixed
