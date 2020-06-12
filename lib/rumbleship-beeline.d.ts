@@ -76,7 +76,7 @@ export declare class RumbleshipBeeline {
      */
     addTraceContext(context: object): void;
     removeContext(context: object): void;
-    marshalTraceContext(context: HoneycombSpan): string;
+    static marshalTraceContext(context: HoneycombSpan): string;
     /**
      *
      * @param context_string The wrapped beeline expects a string, even if it is empty. We accept

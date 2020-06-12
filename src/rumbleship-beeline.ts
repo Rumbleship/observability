@@ -303,7 +303,7 @@ export class RumbleshipBeeline {
   removeContext(context: object): void {
     return RumbleshipBeeline.beeline.removeContext(context);
   }
-  marshalTraceContext(context: HoneycombSpan): string {
+  static marshalTraceContext(context: HoneycombSpan): string {
     return RumbleshipBeeline.beeline.marshalTraceContext(context);
   }
   /**
