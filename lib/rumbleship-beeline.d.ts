@@ -60,6 +60,7 @@ export declare class RumbleshipBeeline {
      * @returns An executable function whose that ensures the --when executed -- passed fn is called
      * inside the specified trace's context
      */
+    static bindFunctionToTrace<T>(fn: () => T, context_id: string): () => T;
     bindFunctionToTrace<T>(fn: () => T, context_id?: string): () => T;
     runWithoutTrace<T>(fn: () => T): T;
     /**
@@ -82,6 +83,6 @@ export declare class RumbleshipBeeline {
      * undefined because that's more typesafe and cast to the empty string.
      */
     unmarshalTraceContext(context_string?: string): HoneycombSpan | object;
-    getTraceContext(): HoneycombSpan;
+    static getTraceContext(): HoneycombSpan;
     traceActive(): boolean;
 }

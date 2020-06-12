@@ -240,6 +240,7 @@ export class RumbleshipBeeline {
   startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
     return RumbleshipBeeline.beeline.startAsyncSpan(metadataContext, fn);
   }
+
   /**
    *
    * @param fn A function to bind
@@ -247,6 +248,23 @@ export class RumbleshipBeeline {
    * @returns An executable function whose that ensures the --when executed -- passed fn is called
    * inside the specified trace's context
    */
+  static bindFunctionToTrace<T>(fn: () => T, context_id: string): () => T {
+    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
+    if (tracked) {
+      RumbleshipBeeline.HnyTracker?.setTracked(tracked);
+      return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+      // RumbleshipBeeline.HnyTracker.deleteTracked() is not required as bindFunctionToTrace()
+      // takes care of that for us.
+    }
+    // I think this case is not actually needed; we completely separate Hapi RequestContext tracking
+    // from RumbleshipContext tracking.
+    else if (RumbleshipBeeline.beeline.withTraceContextFromRequestId) {
+      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(context_id, fn);
+    } else {
+      return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+    }
+  }
+
   bindFunctionToTrace<T>(fn: () => T, context_id: string = this.context_id): () => T {
     const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
     if (tracked) {
@@ -296,7 +314,7 @@ export class RumbleshipBeeline {
   unmarshalTraceContext(context_string?: string): HoneycombSpan | object {
     return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string ?? '') ?? {};
   }
-  getTraceContext(): HoneycombSpan {
+  static getTraceContext(): HoneycombSpan {
     return RumbleshipBeeline.beeline.getTraceContext();
   }
   traceActive(): boolean {
