@@ -83,6 +83,7 @@ export declare class RumbleshipBeeline {
      * undefined because that's more typesafe and cast to the empty string.
      */
     unmarshalTraceContext(context_string?: string): HoneycombSpan | object;
-    static getTraceContext(): HoneycombSpan;
+    static getTraceContext(context_id: string): HoneycombSpan;
+    getTraceContext(): HoneycombSpan;
     traceActive(): boolean;
 }

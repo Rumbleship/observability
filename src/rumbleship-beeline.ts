@@ -314,11 +314,21 @@ export class RumbleshipBeeline {
   unmarshalTraceContext(context_string?: string): HoneycombSpan | object {
     return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string ?? '') ?? {};
   }
-  static getTraceContext(): HoneycombSpan {
-    return RumbleshipBeeline.beeline.getTraceContext();
+  static getTraceContext(context_id: string): HoneycombSpan {
+    return this.bindFunctionToTrace(
+      () => RumbleshipBeeline.beeline.getTraceContext(),
+      context_id
+    )();
+  }
+  getTraceContext(): HoneycombSpan {
+    return this.bindFunctionToTrace(
+      () => RumbleshipBeeline.beeline.getTraceContext(),
+      this.context_id
+    )();
   }
   traceActive(): boolean {
-    return RumbleshipBeeline.beeline.traceActive();
+    return this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive())();
+    // return RumbleshipBeeline.beeline.traceActive();
   }
 }
 
