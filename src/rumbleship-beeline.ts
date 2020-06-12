@@ -240,8 +240,15 @@ export class RumbleshipBeeline {
   startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
     return RumbleshipBeeline.beeline.startAsyncSpan(metadataContext, fn);
   }
-  bindFunctionToTrace<T>(fn: () => T): () => T {
-    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(this.context_id);
+  /**
+   *
+   * @param fn A function to bind
+   * @param context_id The `context_id` to retreive bind the function to @default this.context_id
+   * @returns An executable function whose that ensures the --when executed -- passed fn is called
+   * inside the specified trace's context
+   */
+  bindFunctionToTrace<T>(fn: () => T, context_id: string = this.context_id): () => T {
+    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
     if (tracked) {
       RumbleshipBeeline.HnyTracker?.setTracked(tracked);
       return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);

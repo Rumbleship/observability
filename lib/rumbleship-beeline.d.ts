@@ -53,7 +53,14 @@ export declare class RumbleshipBeeline {
     startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan;
     finishSpan(span: HoneycombSpan, rollup?: string): void;
     startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T;
-    bindFunctionToTrace<T>(fn: () => T): () => T;
+    /**
+     *
+     * @param fn A function to bind
+     * @param context_id The `context_id` to retreive bind the function to @default this.context_id
+     * @returns An executable function whose that ensures the --when executed -- passed fn is called
+     * inside the specified trace's context
+     */
+    bindFunctionToTrace<T>(fn: () => T, context_id?: string): () => T;
     runWithoutTrace<T>(fn: () => T): T;
     /**
      *
