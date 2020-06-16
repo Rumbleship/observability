@@ -50,31 +50,35 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
     Reflect.set(span_metadata, 'class', target.constructor.name);
     Reflect.set(span_metadata, 'method', propertyName.toString());
     const originalMethod = descriptor.value;
-    descriptor.value = function(...args: any[]) {
+    descriptor.value = function(this: any, ...args: any[]) {
       const { beeline, id } =
+        findContextWithBeelineFrom(args ?? []) || // if this is a resolver, with @Ctx injected
         (this as any).ctx || // if this is a service
         (this as any)?._service?.getContext() || // if this is a relay
-        findContextWithBeelineFrom(args) || // if this is a resolver, with @Ctx injected
         {}; // Fallback through
       if (beeline) {
+        const spanContext = {
+          'origin.type': 'decorator',
+          ...span_metadata
+        };
         if (beeline.traceActive()) {
-          const spanContext = {
-            'origin.type': 'decorator',
-            ...span_metadata
-          };
-
           const wrapped = () => originalMethod.apply(this, args);
+          return beeline.withAsyncSpan(spanContext, wrapped);
+        } else {
           const context = RumbleshipBeeline.TrackedContextbyContextId.get(id);
-          RumbleshipBeeline.HnyTracker?.setTracked(context);
-          // We don't need to manually delete this setTracked() since bindFunction...does that.
-          return beeline.bindFunctionToTrace(async () => {
-            const res = await beeline.withAsyncSpan(spanContext, wrapped);
-            return res;
-          })();
+          if (context) {
+            RumbleshipBeeline.HnyTracker?.setTracked(context);
+            // We don't need to manually delete this setTracked() since bindFunction...does that.
+            const wrapped = () => originalMethod.apply(this, args);
+            return beeline.bindFunctionToTrace(async () => {
+              const res = await beeline.withAsyncSpan(spanContext, wrapped);
+              return res;
+            })();
+          }
+          // tslint:disable-next-line: no-console
+          console.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
+          return originalMethod.apply(this, args);
         }
-        // tslint:disable-next-line: no-console
-        console.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
-        return originalMethod.apply(this, args);
       } else {
         throw new Error(
           `Cannot find a Beeline from RumbleshipContext. Two solutions: 
@@ -90,5 +94,5 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
 // do this check with a plain `instanceof RumbleshipContext` -- so we check for a feature we know
 // and very much _need_ to be present: the beeline.
 function findContextWithBeelineFrom(args: any[]): { beeline: RumbleshipBeeline } | undefined {
-  return args.find(arg => !!(arg.beeline instanceof RumbleshipBeeline));
+  return args.find(arg => !!(arg && arg.beeline instanceof RumbleshipBeeline));
 }

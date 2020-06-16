@@ -36,7 +36,7 @@ export declare class RumbleshipBeeline {
      * a single spinner
      */
     linkToSpan(target: HoneycombSpan): void;
-    withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T;
+    withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T;
     /**
      *
      * @param this
@@ -60,9 +60,9 @@ export declare class RumbleshipBeeline {
      * @returns An executable function whose that ensures the --when executed -- passed fn is called
      * inside the specified trace's context
      */
-    static bindFunctionToTrace<T>(fn: () => T, context_id: string): () => T;
-    bindFunctionToTrace<T>(fn: () => T, context_id?: string): () => T;
-    runWithoutTrace<T>(fn: () => T): T;
+    static bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id: string): TF;
+    bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id?: string): TF;
+    runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
     /**
      *
      * @param context Add keys+values of an object to JUST the current span
@@ -76,6 +76,7 @@ export declare class RumbleshipBeeline {
      */
     addTraceContext(context: object): void;
     removeContext(context: object): void;
+    marshalTraceContext(context: HoneycombSpan): string;
     static marshalTraceContext(context: HoneycombSpan): string;
     /**
      *

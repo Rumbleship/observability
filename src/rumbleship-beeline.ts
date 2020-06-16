@@ -77,7 +77,7 @@ export class RumbleshipBeeline {
       })
     );
   }
-  withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T {
+  withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T {
     try {
       return RumbleshipBeeline.beeline.withSpan(metadataContext, fn, rollupKey);
     } catch (error) {
@@ -248,7 +248,10 @@ export class RumbleshipBeeline {
    * @returns An executable function whose that ensures the --when executed -- passed fn is called
    * inside the specified trace's context
    */
-  static bindFunctionToTrace<T>(fn: () => T, context_id: string): () => T {
+  static bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: TF,
+    context_id: string
+  ): TF {
     const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
     if (tracked) {
       RumbleshipBeeline.HnyTracker?.setTracked(tracked);
@@ -265,7 +268,10 @@ export class RumbleshipBeeline {
     }
   }
 
-  bindFunctionToTrace<T>(fn: () => T, context_id: string = this.context_id): () => T {
+  bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: TF,
+    context_id: string = this.context_id
+  ): TF {
     const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
     if (tracked) {
       RumbleshipBeeline.HnyTracker?.setTracked(tracked);
@@ -281,7 +287,15 @@ export class RumbleshipBeeline {
       return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
     }
   }
-  runWithoutTrace<T>(fn: () => T): T {
+
+  static runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: () => T
+  ): TF {
+    return RumbleshipBeeline.beeline.runWithoutTrace(fn);
+  }
+  runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: () => T
+  ): TF {
     return RumbleshipBeeline.beeline.runWithoutTrace(fn);
   }
   /**
@@ -303,6 +317,10 @@ export class RumbleshipBeeline {
   removeContext(context: object): void {
     return RumbleshipBeeline.beeline.removeContext(context);
   }
+
+  marshalTraceContext(context: HoneycombSpan): string {
+    return RumbleshipBeeline.marshalTraceContext(context);
+  }
   static marshalTraceContext(context: HoneycombSpan): string {
     return RumbleshipBeeline.beeline.marshalTraceContext(context);
   }
@@ -315,20 +333,37 @@ export class RumbleshipBeeline {
     return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string ?? '') ?? {};
   }
   static getTraceContext(context_id: string): HoneycombSpan {
+    if (RumbleshipBeeline.beeline.traceActive()) {
+      return RumbleshipBeeline.beeline.getTraceContext();
+    }
     return this.bindFunctionToTrace(
       () => RumbleshipBeeline.beeline.getTraceContext(),
       context_id
     )();
   }
   getTraceContext(): HoneycombSpan {
+    if (RumbleshipBeeline.beeline.traceActive()) {
+      return RumbleshipBeeline.beeline.getTraceContext();
+    }
     return this.bindFunctionToTrace(
       () => RumbleshipBeeline.beeline.getTraceContext(),
       this.context_id
     )();
   }
+
+  static traceActive(context_id: string): boolean {
+    return (
+      RumbleshipBeeline.beeline.traceActive() ??
+      this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive(), context_id)()
+    );
+  }
   traceActive(): boolean {
-    return this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive())();
-    // return RumbleshipBeeline.beeline.traceActive();
+    return (
+      RumbleshipBeeline.beeline.traceActive() ??
+      this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive())()
+    );
+    // return this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive())();
+    return RumbleshipBeeline.beeline.traceActive();
   }
 }
 

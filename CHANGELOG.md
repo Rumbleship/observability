@@ -8,9 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
+  * Trace management functions (`bindFunctionToTrace, runWithoutTrace, marshalTraceContext, unmarshalTraceContext, getTraceContext, traceActive`) all have `static` definitions that accept a `context_id` to bind to / manage. Instance methods continue unchanged, and inflecting the current `context_id` from the current instance.
 ### Removed
 ### Changed
-  * `bindFunctionToTrace` accepts a `context_id` so it can be used in the static context
+  * `@AddToTrace` defaults to using async-context-tree tracking from beeline's `async_tracker`; only if one isn't found does attempt to reset the context from top level `RumbleshipContext`
 ### Fixed
 ### Deprecated
 ### Security
