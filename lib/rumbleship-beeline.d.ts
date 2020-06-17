@@ -62,6 +62,7 @@ export declare class RumbleshipBeeline {
      */
     static bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id: string): TF;
     bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id?: string): TF;
+    static runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
     runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
     /**
      *
@@ -86,5 +87,6 @@ export declare class RumbleshipBeeline {
     unmarshalTraceContext(context_string?: string): HoneycombSpan | object;
     static getTraceContext(context_id: string): HoneycombSpan;
     getTraceContext(): HoneycombSpan;
+    static traceActive(context_id: string): boolean;
     traceActive(): boolean;
 }
