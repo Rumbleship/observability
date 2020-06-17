@@ -288,14 +288,10 @@ export class RumbleshipBeeline {
     }
   }
 
-  static runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
-    fn: () => T
-  ): TF {
+  static runWithoutTrace<T>(fn: () => T): T {
     return RumbleshipBeeline.beeline.runWithoutTrace(fn);
   }
-  runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
-    fn: () => T
-  ): TF {
+  runWithoutTrace<T>(fn: () => T): T {
     return RumbleshipBeeline.beeline.runWithoutTrace(fn);
   }
   /**

@@ -62,8 +62,8 @@ export declare class RumbleshipBeeline {
      */
     static bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id: string): TF;
     bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id?: string): TF;
-    static runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
-    runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
+    static runWithoutTrace<T>(fn: () => T): T;
+    runWithoutTrace<T>(fn: () => T): T;
     /**
      *
      * @param context Add keys+values of an object to JUST the current span
