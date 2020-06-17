@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file. Starting wi
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+### Added
+  * Trace management functions (`bindFunctionToTrace, runWithoutTrace, marshalTraceContext, unmarshalTraceContext, getTraceContext, traceActive`) all have `static` definitions that accept a `context_id` to bind to / manage. Instance methods continue unchanged, and inflecting the current `context_id` from the current instance.
+### Removed
+### Changed
+  * `@AddToTrace` defaults to using async-context-tree tracking from beeline's `async_tracker`; only if one isn't found does attempt to reset the context from top level `RumbleshipContext`
+### Fixed
+### Deprecated
+### Security
+
+
 ## [3.1.4] -- 2020-05-27
 
 ### Added

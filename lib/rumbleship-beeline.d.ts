@@ -36,7 +36,7 @@ export declare class RumbleshipBeeline {
      * a single spinner
      */
     linkToSpan(target: HoneycombSpan): void;
-    withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T;
+    withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T;
     /**
      *
      * @param this
@@ -53,8 +53,16 @@ export declare class RumbleshipBeeline {
     startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan;
     finishSpan(span: HoneycombSpan, rollup?: string): void;
     startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T;
-    bindFunctionToTrace<T>(fn: () => T): () => T;
-    runWithoutTrace<T>(fn: () => T): T;
+    /**
+     *
+     * @param fn A function to bind
+     * @param context_id The `context_id` to retreive bind the function to @default this.context_id
+     * @returns An executable function whose that ensures the --when executed -- passed fn is called
+     * inside the specified trace's context
+     */
+    static bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id: string): TF;
+    bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id?: string): TF;
+    runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
     /**
      *
      * @param context Add keys+values of an object to JUST the current span
@@ -69,12 +77,14 @@ export declare class RumbleshipBeeline {
     addTraceContext(context: object): void;
     removeContext(context: object): void;
     marshalTraceContext(context: HoneycombSpan): string;
+    static marshalTraceContext(context: HoneycombSpan): string;
     /**
      *
      * @param context_string The wrapped beeline expects a string, even if it is empty. We accept
      * undefined because that's more typesafe and cast to the empty string.
      */
     unmarshalTraceContext(context_string?: string): HoneycombSpan | object;
+    static getTraceContext(context_id: string): HoneycombSpan;
     getTraceContext(): HoneycombSpan;
     traceActive(): boolean;
 }

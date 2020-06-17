@@ -77,7 +77,7 @@ export class RumbleshipBeeline {
       })
     );
   }
-  withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T {
+  withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T {
     try {
       return RumbleshipBeeline.beeline.withSpan(metadataContext, fn, rollupKey);
     } catch (error) {
@@ -240,8 +240,39 @@ export class RumbleshipBeeline {
   startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
     return RumbleshipBeeline.beeline.startAsyncSpan(metadataContext, fn);
   }
-  bindFunctionToTrace<T>(fn: () => T): () => T {
-    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(this.context_id);
+
+  /**
+   *
+   * @param fn A function to bind
+   * @param context_id The `context_id` to retreive bind the function to @default this.context_id
+   * @returns An executable function whose that ensures the --when executed -- passed fn is called
+   * inside the specified trace's context
+   */
+  static bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: TF,
+    context_id: string
+  ): TF {
+    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
+    if (tracked) {
+      RumbleshipBeeline.HnyTracker?.setTracked(tracked);
+      return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+      // RumbleshipBeeline.HnyTracker.deleteTracked() is not required as bindFunctionToTrace()
+      // takes care of that for us.
+    }
+    // I think this case is not actually needed; we completely separate Hapi RequestContext tracking
+    // from RumbleshipContext tracking.
+    else if (RumbleshipBeeline.beeline.withTraceContextFromRequestId) {
+      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(context_id, fn);
+    } else {
+      return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
+    }
+  }
+
+  bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: TF,
+    context_id: string = this.context_id
+  ): TF {
+    const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
     if (tracked) {
       RumbleshipBeeline.HnyTracker?.setTracked(tracked);
       return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
@@ -256,7 +287,15 @@ export class RumbleshipBeeline {
       return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
     }
   }
-  runWithoutTrace<T>(fn: () => T): T {
+
+  static runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: () => T
+  ): TF {
+    return RumbleshipBeeline.beeline.runWithoutTrace(fn);
+  }
+  runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(
+    fn: () => T
+  ): TF {
     return RumbleshipBeeline.beeline.runWithoutTrace(fn);
   }
   /**
@@ -278,7 +317,11 @@ export class RumbleshipBeeline {
   removeContext(context: object): void {
     return RumbleshipBeeline.beeline.removeContext(context);
   }
+
   marshalTraceContext(context: HoneycombSpan): string {
+    return RumbleshipBeeline.marshalTraceContext(context);
+  }
+  static marshalTraceContext(context: HoneycombSpan): string {
     return RumbleshipBeeline.beeline.marshalTraceContext(context);
   }
   /**
@@ -289,10 +332,37 @@ export class RumbleshipBeeline {
   unmarshalTraceContext(context_string?: string): HoneycombSpan | object {
     return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string ?? '') ?? {};
   }
+  static getTraceContext(context_id: string): HoneycombSpan {
+    if (RumbleshipBeeline.beeline.traceActive()) {
+      return RumbleshipBeeline.beeline.getTraceContext();
+    }
+    return this.bindFunctionToTrace(
+      () => RumbleshipBeeline.beeline.getTraceContext(),
+      context_id
+    )();
+  }
   getTraceContext(): HoneycombSpan {
-    return RumbleshipBeeline.beeline.getTraceContext();
+    if (RumbleshipBeeline.beeline.traceActive()) {
+      return RumbleshipBeeline.beeline.getTraceContext();
+    }
+    return this.bindFunctionToTrace(
+      () => RumbleshipBeeline.beeline.getTraceContext(),
+      this.context_id
+    )();
+  }
+
+  static traceActive(context_id: string): boolean {
+    return (
+      RumbleshipBeeline.beeline.traceActive() ??
+      this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive(), context_id)()
+    );
   }
   traceActive(): boolean {
+    return (
+      RumbleshipBeeline.beeline.traceActive() ??
+      this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive())()
+    );
+    // return this.bindFunctionToTrace(() => RumbleshipBeeline.beeline.traceActive())();
     return RumbleshipBeeline.beeline.traceActive();
   }
 }
