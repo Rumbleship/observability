@@ -67,15 +67,22 @@ export class RumbleshipBeeline {
    * tl;dr: very useful for linking an event-loading-spinner to a brand new trace
    * that actually processes the events; so we can view how many promise chains fork off
    * a single spinner
+   *
+   *
+   * @note due to inconsistencies in the `HoneycombSpan` type with reality, this probably doesn't work.
+   *  Signature should be more like `({ payload: target }: { payload: HoneycombSpan })`.
+   * @chore https://www.pivotaltracker.com/story/show/173409782
    */
   linkToSpan(target: HoneycombSpan) {
-    this.finishSpan(
-      this.startSpan({
-        [HoneycombSchema.TRACE_LINK_TRACE_ID]: target[HoneycombSchema.TRACE_ID],
-        [HoneycombSchema.TRACE_LINK_SPAN_ID]: target[HoneycombSchema.TRACE_SPAN_ID],
-        [HoneycombSchema.TRACE_LINK_META]: 'link'
-      })
-    );
+    this.bindFunctionToTrace(() => {
+      this.finishSpan(
+        this.startSpan({
+          [HoneycombSchema.TRACE_LINK_TRACE_ID]: target[HoneycombSchema.TRACE_ID],
+          [HoneycombSchema.TRACE_LINK_SPAN_ID]: target[HoneycombSchema.TRACE_SPAN_ID],
+          [HoneycombSchema.TRACE_LINK_META]: 'link'
+        })
+      );
+    })();
   }
   withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T {
     try {
@@ -214,7 +221,7 @@ export class RumbleshipBeeline {
     });
     RumbleshipBeeline.TrackedContextbyContextId.set(
       this.context_id,
-      RumbleshipBeeline.HnyTracker?.getTracked()
+      RumbleshipBeeline.beeline.getTraceContext()
     );
     return trace;
   }
@@ -253,8 +260,8 @@ export class RumbleshipBeeline {
     context_id: string
   ): TF {
     const tracked = RumbleshipBeeline.TrackedContextbyContextId.get(context_id);
-    if (tracked) {
-      RumbleshipBeeline.HnyTracker?.setTracked(tracked);
+    if (tracked && RumbleshipBeeline.HnyTracker) {
+      RumbleshipBeeline.HnyTracker.setTracked(tracked);
       return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
       // RumbleshipBeeline.HnyTracker.deleteTracked() is not required as bindFunctionToTrace()
       // takes care of that for us.
@@ -282,7 +289,7 @@ export class RumbleshipBeeline {
     // I think this case is not actually needed; we completely separate Hapi RequestContext tracking
     // from RumbleshipContext tracking.
     else if (RumbleshipBeeline.beeline.withTraceContextFromRequestId) {
-      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(this.context_id, fn);
+      return RumbleshipBeeline.beeline.withTraceContextFromRequestId(context_id, fn);
     } else {
       return RumbleshipBeeline.beeline.bindFunctionToTrace(fn);
     }

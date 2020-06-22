@@ -34,6 +34,11 @@ export declare class RumbleshipBeeline {
      * tl;dr: very useful for linking an event-loading-spinner to a brand new trace
      * that actually processes the events; so we can view how many promise chains fork off
      * a single spinner
+     *
+     *
+     * @note due to inconsistencies in the `HoneycombSpan` type with reality, this probably doesn't work.
+     *  Signature should be more like `({ payload: target }: { payload: HoneycombSpan })`.
+     * @chore https://www.pivotaltracker.com/story/show/173409782
      */
     linkToSpan(target: HoneycombSpan): void;
     withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T;

@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 ### Fixed
   * Removed extra generic types on `runWithoutTrace()`
+  * Bind `linkToSpan()` to the current trace
+  * Starting a trace extracts context from the beeline stack
 ### Deprecated
 ### Security
 
