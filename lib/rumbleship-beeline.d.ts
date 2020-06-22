@@ -34,6 +34,11 @@ export declare class RumbleshipBeeline {
      * tl;dr: very useful for linking an event-loading-spinner to a brand new trace
      * that actually processes the events; so we can view how many promise chains fork off
      * a single spinner
+     *
+     *
+     * @note due to inconsistencies in the `HoneycombSpan` type with reality, this probably doesn't work.
+     *  Signature should be more like `({ payload: target }: { payload: HoneycombSpan })`.
+     * @chore https://www.pivotaltracker.com/story/show/173409782
      */
     linkToSpan(target: HoneycombSpan): void;
     withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T;
@@ -62,8 +67,8 @@ export declare class RumbleshipBeeline {
      */
     static bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id: string): TF;
     bindFunctionToTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: TF, context_id?: string): TF;
-    static runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
-    runWithoutTrace<T, TA extends any[] = any[], TF = ((...args: TA) => T) | (() => T)>(fn: () => T): TF;
+    static runWithoutTrace<T>(fn: () => T): T;
+    runWithoutTrace<T>(fn: () => T): T;
     /**
      *
      * @param context Add keys+values of an object to JUST the current span
