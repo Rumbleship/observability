@@ -48,7 +48,7 @@ export interface HoneycombConfiguration {
     writeKey: string;
     dataset: string;
     serviceName: string;
-    samplerHook: (event: HoneycombSpan) => SamplerResponse;
+    samplerHook?: (event: HoneycombSpan) => SamplerResponse;
     enabledInstrumentations: Array<keyof HoneycombInstrumentations>;
 }
 export interface IAsyncTracker {
