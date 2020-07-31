@@ -19,11 +19,15 @@ export class RumbleshipBeeline {
     config: HoneycombConfiguration
   ) {
     if (this.initialized) {
-      throw new Error('RumbleshipBeeline already initialized as a singleton. Cannot reinitialize');
+      // tslint:disable-next-line: no-console
+      console.warn(
+        'RumbleshipBeeline already initialized as a singleton. Cannot reinitialize with new options.'
+      );
+    } else {
+      const sampler = new SamplerPipeline();
+      this.beeline = configureBeeline({ samplerHook: sampler.sample, ...config });
+      this.initialized = true;
     }
-    const sampler = new SamplerPipeline();
-    this.beeline = configureBeeline({ samplerHook: sampler.sample, ...config });
-    this.initialized = true;
   }
 
   /**
