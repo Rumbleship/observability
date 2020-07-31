@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 ### Removed
 ### Changed
+  * RumbleshipBeeline.initialize just warns if called > 1x instead of throwing
 ### Fixed
   * launch.json boilerplate for new debugger
 ### Deprecated
