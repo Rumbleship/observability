@@ -12,7 +12,7 @@ class DeterministicMatchedSampler extends DeterministicSampler {
   constructor(protected sample_rate: number, protected match_against: string) {
     super(sample_rate);
   }
-  sample(data: object) {
+  sample(data: Record<string, unknown>) {
     return {
       ...super.sample(data),
       matched: Reflect.get(data, 'match_against') === this.match_against

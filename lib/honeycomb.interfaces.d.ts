@@ -1,8 +1,9 @@
 export interface SamplerResponse {
     shouldSample: boolean;
     sampleRate?: number;
+    matched?: boolean;
 }
-export declare type SamplerFn = (event: object) => SamplerResponse;
+export declare type SamplerFn = (event: Record<string, unknown>) => SamplerResponse;
 export declare enum HoneycombSchema {
     EVENT_TYPE = "meta.type",
     NODE_VERSION = "meta.node_version",
@@ -25,7 +26,7 @@ export declare enum HoneycombSchema {
 }
 export interface HoneycombSpan {
     id: string;
-    customContext?: object;
+    customContext?: Record<string, unknown>;
     stack: HoneycombSpan[];
     dataset: string;
     traceId: string;
@@ -48,7 +49,7 @@ export interface HoneycombConfiguration {
     writeKey: string;
     dataset: string;
     serviceName: string;
-    samplerHook?: (event: HoneycombSpan) => SamplerResponse;
+    samplerHook?: (data: Record<string, unknown>) => SamplerResponse;
     enabledInstrumentations: Array<keyof HoneycombInstrumentations>;
 }
 export interface IAsyncTracker {
@@ -59,6 +60,6 @@ export interface IAsyncTracker {
     runWithoutTracking<T>(arg0: () => T): T;
     bindFunction<T>(arg0: () => T): T;
     callWithContext<T>(arg0: () => T, context: HoneycombSpan): T;
-    init(asyncId: number, type: string, triggerAsyncId: number, resource: object): void;
+    init(asyncId: number, type: string, triggerAsyncId: number, resource: Record<string, unknown>): void;
     destroy(asyncId: number): void;
 }

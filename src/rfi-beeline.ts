@@ -16,6 +16,7 @@ export class HoneycombBeelineFactory {
    */
   constructor(config: { writeKey: string; dataset: string; serviceName: string }) {
     if (!HoneycombBeelineFactory.globalBeeline) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       HoneycombBeelineFactory.globalBeeline = require('honeycomb-beeline')({
         ...config,
         enabledInstrumentations: ['http', 'https', 'sequelize', 'mysql2', '@hapi/hapi']
@@ -34,14 +35,22 @@ export class HoneycombBeelineFactory {
   }
 }
 abstract class Beeline {
-  withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T, rollupKey?: string): T {
+  withSpan<T>(
+    metadataContext: Record<string, unknown>,
+    fn: (span: HoneycombSpan) => T,
+    rollupKey?: string
+  ): T {
     throw new Error('missing implementation');
   }
-  withAsyncSpan<T>(this: Beeline, metadataContext: object, fn: () => T): Promise<T> {
+  withAsyncSpan<T>(
+    this: Beeline,
+    metadataContext: Record<string, unknown>,
+    fn: () => T
+  ): Promise<T> {
     throw new Error('missing implementation');
   }
   withTrace<T>(
-    metadataContext: object,
+    metadataContext: Record<string, unknown>,
     fn: () => T,
     withTraceId?: string,
     withParentSpanId?: string,
@@ -50,7 +59,7 @@ abstract class Beeline {
     throw new Error('missing implementation');
   }
   startTrace(
-    metadataContext: object,
+    metadataContext: Record<string, unknown>,
     traceId?: string,
     parentSpanId?: string,
     dataset?: string
@@ -62,20 +71,24 @@ abstract class Beeline {
   }
   // startAsyncTrace(
   //   this: Beeline,
-  //   metadataContext: object,
+  //   metadataContext: Record<string, unknown>,
   //   traceId?: string,
   //   parentSpanId?: string,
   //   dataset?: string
   // ): HoneycombSpan {
   //   throw new Error('missing implementation');
   // }
-  startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan {
+  startSpan(
+    metadataContext: Record<string, unknown>,
+    spanId?: string,
+    parentId?: string
+  ): HoneycombSpan {
     throw new Error('missing implementation');
   }
   finishSpan(span: HoneycombSpan, rollup?: string): void {
     throw new Error('missing implementation');
   }
-  startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
+  startAsyncSpan<T>(metadataContext: Record<string, unknown>, fn: (span: HoneycombSpan) => T): T {
     throw new Error('missing implementation');
   }
   bindFunctionToTrace<T>(fn: () => T): T {
@@ -84,10 +97,10 @@ abstract class Beeline {
   runWithoutTrace<T>(fn: () => T): T {
     throw new Error('missing implementation');
   }
-  addContext(context: object): void {
+  addContext(context: Record<string, unknown>): void {
     throw new Error('missing implementation');
   }
-  removeContext(context: object): void {
+  removeContext(context: Record<string, unknown>): void {
     throw new Error('missing implementation');
   }
   marshalTraceContext(context: HoneycombSpan): string {
@@ -101,8 +114,12 @@ abstract class Beeline {
   }
 }
 
+/**
+ * @deprecated
+ */
 export class RFIBeeline extends Beeline {
   private _beelineImplementation: any;
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   constructor(public requestId: string, beelineImplementation?: any) {
     super();
 
@@ -116,11 +133,11 @@ export class RFIBeeline extends Beeline {
     });
   }
 
-  get beeline() {
+  get beeline(): any {
     return this._beelineImplementation;
   }
 
-  withSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
+  withSpan<T>(metadataContext: Record<string, unknown>, fn: (span: HoneycombSpan) => T): T {
     try {
       return super.withSpan<T>(metadataContext, fn);
     } catch (error) {
@@ -134,7 +151,12 @@ export class RFIBeeline extends Beeline {
     }
   }
   // tslint:disable-next-line: ban-types
-  withAsyncSpan(this: RFIBeeline, spanData: any, spanFn: Function): Promise<any> {
+  withAsyncSpan(
+    this: RFIBeeline,
+    spanData: Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    spanFn: Function
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       const value = this.startAsyncSpan(spanData, (span: any) => {
         let innerValue;

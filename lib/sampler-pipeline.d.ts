@@ -11,5 +11,5 @@ export declare class SamplerPipeline {
      * @returns SamplerResponse: from the first matched sampler to return { shouldSample:true }
      *  otherwise return {shouldSample: false }
      */
-    sample(data: object): SamplerResponse;
+    sample(data: Record<string, unknown>): SamplerResponse;
 }

@@ -1,4 +1,5 @@
 import { DeterministicSampler, TargettedSampler, MatchBypass } from './deterministic.sampler';
+import { SamplerResponse } from './../honeycomb.interfaces';
 export declare class RouteSampler extends DeterministicSampler implements TargettedSampler {
     private route_regex;
     match_bypass: MatchBypass;
@@ -13,9 +14,5 @@ export declare class RouteSampler extends DeterministicSampler implements Target
      *
      * Else, return sampled, but without a rate (Hny defaults to rate:1)
      */
-    sample(event_data: object): {
-        matched: boolean;
-        shouldSample: boolean;
-        sampleRate?: number | undefined;
-    };
+    sample(event_data: Record<string, unknown>): SamplerResponse;
 }

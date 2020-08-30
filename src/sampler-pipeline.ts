@@ -20,7 +20,7 @@ export class SamplerPipeline {
    * @returns SamplerResponse: from the first matched sampler to return { shouldSample:true }
    *  otherwise return {shouldSample: false }
    */
-  sample(data: object): SamplerResponse {
+  sample(data: Record<string, unknown>): SamplerResponse {
     const targetted_sampler_results = this.targetted_samplers
       .map(sampler => sampler.sample(data))
       .filter(res => res.matched);
