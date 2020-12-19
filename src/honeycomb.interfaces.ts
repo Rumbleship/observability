@@ -60,7 +60,6 @@ export interface HoneycombConfiguration {
   // [key in HoneycombInstrumentations]: any;
 }
 
-// tslint:disable-next-line: interface-name
 export interface IAsyncTracker {
   tracked: Map<any, any>;
 

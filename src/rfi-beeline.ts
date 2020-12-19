@@ -231,7 +231,6 @@ export class RFIBeeline extends Beeline {
   }
 }
 
-// tslint:disable-next-line: interface-name
 export interface IHoneycombBeelineFactory {
   make: (requestId: string, beelineImplementation?: any) => RFIBeeline;
 }

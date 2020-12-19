@@ -51,7 +51,7 @@ export function AddToTrace(span_metadata: Record<string, unknown> = {}): MethodD
     Reflect.set(span_metadata, 'method', propertyName.toString());
     const originalMethod = descriptor.value;
     descriptor.value = function (this: any, ...args: any[]) {
-      const { beeline, id } =
+      const { beeline, id, logger } =
         findContextWithBeelineFrom(args ?? []) || // if this is a resolver, with @Ctx injected
         (this as any).ctx || // if this is a service
         (this as any)?._service?.getContext() || // if this is a relay
@@ -76,7 +76,9 @@ export function AddToTrace(span_metadata: Record<string, unknown> = {}): MethodD
             })();
           }
           // tslint:disable-next-line: no-console
-          console.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
+          if (logger) {
+            logger.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
+          }
           return originalMethod.apply(this, args);
         }
       } else {
