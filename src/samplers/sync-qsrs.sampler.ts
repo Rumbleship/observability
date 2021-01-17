@@ -15,12 +15,16 @@ export class SyncQsrsSampler extends DeterministicSampler implements TargettedSa
    *
    * @usage filter out events like this: https://ui.honeycomb.io/rumbleship-financial/datasets/production/result/9rS7jpoPdpp
    */
-  sample(event_data: Record<string, unknown>): SamplerResponse {
+  sample(event_data: Record<string, any>): SamplerResponse {
     const name = Reflect.get(event_data, 'name');
     const gcloud_topic_name = Reflect.get(event_data, 'app.gcloud_topic_name');
     const gcloud_subscription_name = Reflect.get(event_data, 'app.gcloud_subscription_name');
-    const publish_to_topic_name = Reflect.get(event_data, 'app.request.publish_to_topic_name');
-    const client_request_id = Reflect.get(event_data, 'app.request.client_request_id');
+    const publish_to_topic_name = event_data.request
+      ? Reflect.get(event_data.request, 'publish_to_topic_name')
+      : Reflect.get(event_data, 'app.request.publish_to_topic_name');
+    const client_request_id = event_data.request
+      ? Reflect.get(event_data.request, 'client_request_id')
+      : Reflect.get(event_data, 'app.request.client_request_id');
 
     const parent_id = Reflect.get(event_data, HoneycombSchema.TRACE_PARENT_ID);
     if (

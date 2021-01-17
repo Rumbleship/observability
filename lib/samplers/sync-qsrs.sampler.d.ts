@@ -7,5 +7,5 @@ export declare class SyncQsrsSampler extends DeterministicSampler implements Tar
      *
      * @usage filter out events like this: https://ui.honeycomb.io/rumbleship-financial/datasets/production/result/9rS7jpoPdpp
      */
-    sample(event_data: Record<string, unknown>): SamplerResponse;
+    sample(event_data: Record<string, any>): SamplerResponse;
 }
