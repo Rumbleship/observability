@@ -17,6 +17,9 @@ export declare class RumbleshipBeeline {
      * Replaces initial `RumbleshipBeeline` with  the beeline that has been
      * reconfigured and extended by the `@hapi/hapi` instrumentation so `bindFunctionToTrace()`
      * picks up the Hapi request context
+     *
+     * BUT! it copies across the internal, rumbleship-initialized, samplerHook, that the Hapi
+     * instrumentation-configured one does not seem to pick up.
      */
     static shimFromInstrumentation<T>(server_like: T): T;
     /**
