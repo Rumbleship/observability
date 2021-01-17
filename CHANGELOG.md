@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 ### Changed
 ### Fixed
+  * Hacky propagate `samplerHook` with latest (forked) beeline
+  * Better sampling for SyncQsr
 ### Deprecated
 ### Security
 
