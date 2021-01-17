@@ -13,8 +13,15 @@ export class SyncQsrsSampler extends DeterministicSampler implements TargettedSa
 
   sample(event_data: Record<string, unknown>): SamplerResponse {
     const client_request_id = Reflect.get(event_data, 'app.request.client_request_id');
+    const name = Reflect.get(event_data, 'name');
+    const publish_to_topic_name = Reflect.get(event_data, 'app.request.publish_to_topic_name');
+
     const parent_id = Reflect.get(event_data, HoneycombSchema.TRACE_PARENT_ID);
-    if (client_request_id === 'GetAllQueuedSubscriptionRequests') {
+    if (
+      client_request_id === 'GetAllQueuedSubscriptionRequests' &&
+      name === 'resolve' &&
+      publish_to_topic_name.match(/^\w+_GRAPHQL_RESPONSE_\w+$/)
+    ) {
       if (!parent_id) {
         return { ...super.sample(event_data), matched: true };
       }
