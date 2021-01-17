@@ -25,9 +25,9 @@ export class SyncQsrsSampler extends DeterministicSampler implements TargettedSa
     const parent_id = Reflect.get(event_data, HoneycombSchema.TRACE_PARENT_ID);
     if (
       name === 'resolve' &&
-      gcloud_topic_name.match(/^[\w-]+_GRAPHQL_REQUEST$/) &&
-      gcloud_subscription_name.match(/^[\w-]+_GRAPHQL_REQUEST_orders$/) &&
-      publish_to_topic_name.match(/^[\w-]+_GRAPHQL_RESPONSE_\w+$/) &&
+      gcloud_topic_name?.match(/^[\w-]+_GRAPHQL_REQUEST$/) &&
+      gcloud_subscription_name?.match(/^[\w-]+_GRAPHQL_REQUEST_orders$/) &&
+      publish_to_topic_name?.match(/^[\w-]+_GRAPHQL_RESPONSE_\w+$/) &&
       client_request_id === 'GetAllQueuedSubscriptionRequests'
     ) {
       if (!parent_id) {
