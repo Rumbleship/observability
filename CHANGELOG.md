@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
-
+  * 1/100 samplers for:
+    * `onRequest` whose duration is < 1ms
+    * `app.request.client_request_id` === `GetAllQueuedSubscriptionRequests` (syncing QSRs)
+    * `db.query` === `SET time_zone = '+00:00'`
   * tslint
 ### Changed
   * eslint
