@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 
 ### Added
+    * `name` === 'resolve' && `app.request.publish_to_topic_name` is used to sync QSRs on instance startup
 ### Removed
 ### Changed
+  * SyncQsr sampler looks for `name` === 'resolve' && `app.request.publish_to_topic_name` ~= `/.*GRAPHQL_RESPONSE.*/`
 ### Fixed
 ### Deprecated
 ### Security
