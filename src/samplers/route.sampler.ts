@@ -1,5 +1,5 @@
 import { DeterministicSampler, TargettedSampler, MatchBypass } from './deterministic.sampler';
-import { HoneycombSchema } from './../honeycomb.interfaces';
+import { HoneycombSchema, SamplerResponse } from './../honeycomb.interfaces';
 
 export class RouteSampler extends DeterministicSampler implements TargettedSampler {
   match_bypass: MatchBypass = {
@@ -20,7 +20,7 @@ export class RouteSampler extends DeterministicSampler implements TargettedSampl
    *
    * Else, return sampled, but without a rate (Hny defaults to rate:1)
    */
-  sample(event_data: object) {
+  sample(event_data: Record<string, unknown>): SamplerResponse {
     const route_path = Reflect.get(event_data, 'app.request.path');
     const parent_id = Reflect.get(event_data, HoneycombSchema.TRACE_PARENT_ID);
     if (route_path?.match(this.route_regex)) {

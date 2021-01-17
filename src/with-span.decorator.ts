@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { RumbleshipBeeline } from './rumbleship-beeline';
-export function WithSpan(context: object = {}): MethodDecorator {
+export function WithSpan(context: Record<string, unknown> = {}): MethodDecorator {
   // tslint:disable-next-line: no-console
   console.warn(
     '@rumbleship/o11y.WithSpan is now deprecated. Update to @rumbleship/o11y.WithAsyncSpan'
@@ -10,7 +10,7 @@ export function WithSpan(context: object = {}): MethodDecorator {
     // NOTE: because the ctx is defined in the framework, this should probably be defined in the framework too
     // The framework should dependn on `@rumbleship/o11y` and then export WithSpan? That seems...ugly.
     // But better than making `@rumbleship/o11y` depend on the framework to get Context type?
-    descriptor.value = function(...args: any[]) {
+    descriptor.value = function (...args: any[]) {
       // If we're in a SequelizeBaseService vs a RelayService (?)
       const { rfiBeeline } = (this as any).ctx || args[0];
       // tslint:disable-next-line: no-console
@@ -42,7 +42,7 @@ export function WithSpan(context: object = {}): MethodDecorator {
  *                    method: `${wrappedMethod.name}`
  *                  }
  */
-export function AddToTrace(span_metadata: object = {}): MethodDecorator {
+export function AddToTrace(span_metadata: Record<string, unknown> = {}): MethodDecorator {
   return (target: any, propertyName: string | symbol, descriptor: PropertyDescriptor) => {
     if (!(span_metadata as any).name) {
       Reflect.set(span_metadata, 'name', `${target.constructor.name}.${propertyName.toString()}`);
@@ -50,8 +50,8 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
     Reflect.set(span_metadata, 'class', target.constructor.name);
     Reflect.set(span_metadata, 'method', propertyName.toString());
     const originalMethod = descriptor.value;
-    descriptor.value = function(this: any, ...args: any[]) {
-      const { beeline, id } =
+    descriptor.value = function (this: any, ...args: any[]) {
+      const { beeline, id, logger } =
         findContextWithBeelineFrom(args ?? []) || // if this is a resolver, with @Ctx injected
         (this as any).ctx || // if this is a service
         (this as any)?._service?.getContext() || // if this is a relay
@@ -76,7 +76,9 @@ export function AddToTrace(span_metadata: object = {}): MethodDecorator {
             })();
           }
           // tslint:disable-next-line: no-console
-          console.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
+          if (logger) {
+            logger.warn(`'AddToTrace' invoked without an active span:\n ${new Error().stack}`);
+          }
           return originalMethod.apply(this, args);
         }
       } else {

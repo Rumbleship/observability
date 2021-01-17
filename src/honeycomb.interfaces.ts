@@ -1,8 +1,9 @@
 export interface SamplerResponse {
   shouldSample: boolean;
   sampleRate?: number;
+  matched?: boolean;
 }
-export type SamplerFn = (event: object) => SamplerResponse;
+export type SamplerFn = (event: Record<string, unknown>) => SamplerResponse;
 
 // Extracted from `beeline-nodejs/lib/schema.js`
 export enum HoneycombSchema {
@@ -28,7 +29,7 @@ export enum HoneycombSchema {
 
 export interface HoneycombSpan {
   id: string;
-  customContext?: object;
+  customContext?: Record<string, unknown>;
   stack: HoneycombSpan[];
   dataset: string;
   traceId: string;
@@ -54,12 +55,11 @@ export interface HoneycombConfiguration {
   writeKey: string;
   dataset: string;
   serviceName: string;
-  samplerHook?: (event: HoneycombSpan) => SamplerResponse;
+  samplerHook?: (data: Record<string, unknown>) => SamplerResponse;
   enabledInstrumentations: Array<keyof HoneycombInstrumentations>; // string[];
   // [key in HoneycombInstrumentations]: any;
 }
 
-// tslint:disable-next-line: interface-name
 export interface IAsyncTracker {
   tracked: Map<any, any>;
 
@@ -73,6 +73,11 @@ export interface IAsyncTracker {
   // below is the portion of the async_hooks api we need.  they shouldn't be called directly
   // from user code.  They also aren't async safe - if any async code is added to them (like console.log)
   // we'll blow the stack.
-  init(asyncId: number, type: string, triggerAsyncId: number, resource: object): void;
+  init(
+    asyncId: number,
+    type: string,
+    triggerAsyncId: number,
+    resource: Record<string, unknown>
+  ): void;
   destroy(asyncId: number): void;
 }

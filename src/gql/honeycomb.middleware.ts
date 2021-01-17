@@ -34,11 +34,11 @@ export const HoneycombMiddleware: MiddlewareFn = (
 };
 
 export class RumbleshipTraceMiddleware implements MiddlewareInterface {
-  use({ root, args, context, info }: ResolverData, next: NextFn) {
+  use({ root, args, context, info }: ResolverData, next: NextFn): any {
     if (context) {
       const { beeline } = context as any;
       // tslint:disable-next-line: only-arrow-functions
-      return beeline.bindFunctionToTrace(function() {
+      return beeline.bindFunctionToTrace(function () {
         return beeline.withAsyncSpan({ name: 'resolve' }, async () => {
           const result = await next();
           return result;

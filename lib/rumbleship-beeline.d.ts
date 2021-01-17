@@ -25,7 +25,7 @@ export declare class RumbleshipBeeline {
      * Likely `service_context_id` or `request_id`
      */
     static make(context_id: string): RumbleshipBeeline;
-    static flush(): any;
+    static flush(): unknown;
     constructor(context_id: string);
     /**
      *
@@ -41,7 +41,7 @@ export declare class RumbleshipBeeline {
      * @chore https://www.pivotaltracker.com/story/show/173409782
      */
     linkToSpan(target: HoneycombSpan): void;
-    withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T;
+    withSpan<T>(metadataContext: Record<string, unknown>, fn: () => T, rollupKey?: string): T;
     /**
      *
      * @param this
@@ -51,13 +51,13 @@ export declare class RumbleshipBeeline {
      * @NOTE You 99.99% want the fn to be `async` and await its result before returning.
      *  If you don't, the wrapped cb is finished outside of context and trace is lost.
      */
-    withAsyncSpan<T>(this: RumbleshipBeeline, metadata_context: object, fn: (span: HoneycombSpan) => Promise<T> | T): Promise<T>;
-    withTrace<T>(metadataContext: object, fn: () => T, withTraceId?: string, withParentSpanId?: string, withDataset?: string): T;
-    startTrace(span_data: object, traceId?: string, parentSpanId?: string, dataset?: string): HoneycombSpan;
+    withAsyncSpan<T>(this: RumbleshipBeeline, metadata_context: Record<string, unknown>, fn: (span: HoneycombSpan) => Promise<T> | T): Promise<T>;
+    withTrace<T>(metadataContext: Record<string, unknown>, fn: () => T, withTraceId?: string, withParentSpanId?: string, withDataset?: string): T;
+    startTrace(span_data: Record<string, unknown>, traceId?: string, parentSpanId?: string, dataset?: string): HoneycombSpan;
     finishTrace(span: HoneycombSpan): void;
-    startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan;
+    startSpan(metadataContext: Record<string, unknown>, spanId?: string, parentId?: string): HoneycombSpan;
     finishSpan(span: HoneycombSpan, rollup?: string): void;
-    startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T;
+    startAsyncSpan<T>(metadataContext: Record<string, unknown>, fn: (span: HoneycombSpan) => T): T;
     /**
      *
      * @param fn A function to bind
@@ -74,14 +74,14 @@ export declare class RumbleshipBeeline {
      * @param context Add keys+values of an object to JUST the current span
      * @note you probably want `addTraceContext()` to propagate your metadata to all children.
      */
-    addContext(context: object): void;
+    addContext(context: Record<string, unknown>): void;
     /**
      *
      * @param context Add keys+values of object to the current span AND ALL CHILD SPANS
      *  Keys are automatically prefixed with `app.`
      */
-    addTraceContext(context: object): void;
-    removeContext(context: object): void;
+    addTraceContext(context: Record<string, unknown>): void;
+    removeContext(context: Record<string, unknown>): void;
     marshalTraceContext(context: HoneycombSpan): string;
     static marshalTraceContext(context: HoneycombSpan): string;
     /**
@@ -89,7 +89,7 @@ export declare class RumbleshipBeeline {
      * @param context_string The wrapped beeline expects a string, even if it is empty. We accept
      * undefined because that's more typesafe and cast to the empty string.
      */
-    unmarshalTraceContext(context_string?: string): HoneycombSpan | object;
+    unmarshalTraceContext(context_string?: string): HoneycombSpan | Record<string, unknown>;
     static getTraceContext(context_id: string): HoneycombSpan;
     getTraceContext(): HoneycombSpan;
     static traceActive(context_id: string): boolean;

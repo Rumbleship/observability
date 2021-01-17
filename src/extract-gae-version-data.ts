@@ -1,5 +1,5 @@
 import { RumbleshipBeeline } from './rumbleship-beeline';
-export function addGaeVersionDataToTrace(beelineCb: () => RumbleshipBeeline | undefined) {
+export function addGaeVersionDataToTrace(beelineCb: () => RumbleshipBeeline | undefined): void {
   const beeline = beelineCb();
   beeline?.addTraceContext({
     'gae.env.GAE_APPLICATION': process.env.GAE_APPLICATION,

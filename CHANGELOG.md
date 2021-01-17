@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file. Starting wi
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+### Added
+  * 1/100 samplers for:
+    * `onRequest` whose duration is < 1ms
+    * `app.request.client_request_id` === `GetAllQueuedSubscriptionRequests` (syncing QSRs)
+    * `db.query` === `SET time_zone = '+00:00'`
+  * tslint
+### Changed
+  * eslint
+  * Typescript 4
+### Fixed
+### Deprecated
+### Security
+
+
 ## [4.0.2] -- 2020-07-31
 
 ### Changed

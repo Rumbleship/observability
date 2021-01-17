@@ -1,13 +1,19 @@
 import { HealthCheckRouteSampler } from './samplers/health-check.sampler';
 import { RootRouteSampler } from './samplers/root-route.sampler';
+import { QueryTimestampSampler } from './samplers/query-timestamp.sampler';
+import { RidiculouslyShortOnRequestSampler } from './samplers/ridiculously-short-on-request.sampler';
 import { SamplerResponse } from './honeycomb.interfaces';
 import { TargettedSampler, Sampler } from './samplers/deterministic.sampler';
+import { SyncQsrsSampler } from './samplers/sync-qsrs.sampler';
 
 export class SamplerPipeline {
   constructor(
     protected targetted_samplers: TargettedSampler[] = [
       new HealthCheckRouteSampler(),
-      new RootRouteSampler()
+      new RootRouteSampler(),
+      new QueryTimestampSampler(),
+      new RidiculouslyShortOnRequestSampler(),
+      new SyncQsrsSampler()
     ],
     protected global_sampler?: Sampler
   ) {
@@ -20,7 +26,7 @@ export class SamplerPipeline {
    * @returns SamplerResponse: from the first matched sampler to return { shouldSample:true }
    *  otherwise return {shouldSample: false }
    */
-  sample(data: object): SamplerResponse {
+  sample(data: Record<string, unknown>): SamplerResponse {
     const targetted_sampler_results = this.targetted_samplers
       .map(sampler => sampler.sample(data))
       .filter(res => res.matched);

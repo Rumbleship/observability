@@ -9,7 +9,7 @@ export class RumbleshipBeeline {
   private static beeline: any; // The wrapped beeline from `require('honeycomb-beeline')`;
   static TrackedContextbyContextId: Map<string, any> = new Map();
   static HnyTracker?: IAsyncTracker; // the async_tracker from deep inside honeycomb-beeline
-  private static initialized: boolean = false;
+  private static initialized = false;
   /**
    * @param configureBeeline `require('honeycomb-beeline')`
    * @param config configuration to pass directly to the native honeycomb config function
@@ -17,7 +17,7 @@ export class RumbleshipBeeline {
   static initialize(
     configureBeeline: (config: HoneycombConfiguration) => any,
     config: HoneycombConfiguration
-  ) {
+  ): void {
     if (this.initialized) {
       // tslint:disable-next-line: no-console
       console.warn(
@@ -60,7 +60,7 @@ export class RumbleshipBeeline {
     }
     return new RumbleshipBeeline(context_id);
   }
-  static flush() {
+  static flush(): unknown {
     return RumbleshipBeeline.beeline.flush();
   }
   constructor(private context_id: string) {}
@@ -77,7 +77,7 @@ export class RumbleshipBeeline {
    *  Signature should be more like `({ payload: target }: { payload: HoneycombSpan })`.
    * @chore https://www.pivotaltracker.com/story/show/173409782
    */
-  linkToSpan(target: HoneycombSpan) {
+  linkToSpan(target: HoneycombSpan): void {
     this.bindFunctionToTrace(() => {
       this.finishSpan(
         this.startSpan({
@@ -88,7 +88,7 @@ export class RumbleshipBeeline {
       );
     })();
   }
-  withSpan<T>(metadataContext: object, fn: () => T, rollupKey?: string): T {
+  withSpan<T>(metadataContext: Record<string, unknown>, fn: () => T, rollupKey?: string): T {
     try {
       return RumbleshipBeeline.beeline.withSpan(metadataContext, fn, rollupKey);
     } catch (error) {
@@ -112,7 +112,7 @@ export class RumbleshipBeeline {
    */
   withAsyncSpan<T>(
     this: RumbleshipBeeline,
-    metadata_context: object,
+    metadata_context: Record<string, unknown>,
     fn: (span: HoneycombSpan) => Promise<T> | T
   ): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -181,7 +181,7 @@ export class RumbleshipBeeline {
     });
   }
   withTrace<T>(
-    metadataContext: object,
+    metadataContext: Record<string, unknown>,
     fn: () => T,
     withTraceId?: string,
     withParentSpanId?: string,
@@ -197,7 +197,7 @@ export class RumbleshipBeeline {
   }
 
   startTrace(
-    span_data: object,
+    span_data: Record<string, unknown>,
     traceId?: string,
     parentSpanId?: string,
     dataset?: string
@@ -242,13 +242,17 @@ export class RumbleshipBeeline {
     // beeline.finishTrace() takes care of deleting its own map, but we have to delete from ours.
     RumbleshipBeeline.TrackedContextbyContextId.delete(this.context_id);
   }
-  startSpan(metadataContext: object, spanId?: string, parentId?: string): HoneycombSpan {
+  startSpan(
+    metadataContext: Record<string, unknown>,
+    spanId?: string,
+    parentId?: string
+  ): HoneycombSpan {
     return RumbleshipBeeline.beeline.startSpan(metadataContext, spanId, parentId);
   }
   finishSpan(span: HoneycombSpan, rollup?: string): void {
     return RumbleshipBeeline.beeline.finishSpan(span, rollup);
   }
-  startAsyncSpan<T>(metadataContext: object, fn: (span: HoneycombSpan) => T): T {
+  startAsyncSpan<T>(metadataContext: Record<string, unknown>, fn: (span: HoneycombSpan) => T): T {
     return RumbleshipBeeline.beeline.startAsyncSpan(metadataContext, fn);
   }
 
@@ -310,7 +314,7 @@ export class RumbleshipBeeline {
    * @param context Add keys+values of an object to JUST the current span
    * @note you probably want `addTraceContext()` to propagate your metadata to all children.
    */
-  addContext(context: object): void {
+  addContext(context: Record<string, unknown>): void {
     return RumbleshipBeeline.beeline.addContext(context);
   }
   /**
@@ -318,10 +322,10 @@ export class RumbleshipBeeline {
    * @param context Add keys+values of object to the current span AND ALL CHILD SPANS
    *  Keys are automatically prefixed with `app.`
    */
-  addTraceContext(context: object): void {
+  addTraceContext(context: Record<string, unknown>): void {
     return RumbleshipBeeline.beeline.addTraceContext(context);
   }
-  removeContext(context: object): void {
+  removeContext(context: Record<string, unknown>): void {
     return RumbleshipBeeline.beeline.removeContext(context);
   }
 
@@ -336,7 +340,7 @@ export class RumbleshipBeeline {
    * @param context_string The wrapped beeline expects a string, even if it is empty. We accept
    * undefined because that's more typesafe and cast to the empty string.
    */
-  unmarshalTraceContext(context_string?: string): HoneycombSpan | object {
+  unmarshalTraceContext(context_string?: string): HoneycombSpan | Record<string, unknown> {
     return RumbleshipBeeline.beeline.unmarshalTraceContext(context_string ?? '') ?? {};
   }
   static getTraceContext(context_id: string): HoneycombSpan {
