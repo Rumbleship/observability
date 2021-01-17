@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file. Starting wi
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [4.1.0] -- 2021-01-17
 
 ### Added
   * 1/100 samplers for:
@@ -16,10 +16,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
   * eslint
   * Typescript 4
-### Fixed
-### Deprecated
-### Security
-
 
 ## [4.0.2] -- 2020-07-31
 
