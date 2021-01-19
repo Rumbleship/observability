@@ -11,16 +11,28 @@ export class SyncQsrsSampler extends DeterministicSampler implements TargettedSa
     super(sample_rate);
   }
 
-  sample(event_data: Record<string, unknown>): SamplerResponse {
-    const client_request_id = Reflect.get(event_data, 'app.request.client_request_id');
+  /**
+   *
+   * @usage filter out events like this: https://ui.honeycomb.io/rumbleship-financial/datasets/production/result/9rS7jpoPdpp
+   */
+  sample(event_data: Record<string, any>): SamplerResponse {
     const name = Reflect.get(event_data, 'name');
-    const publish_to_topic_name = Reflect.get(event_data, 'app.request.publish_to_topic_name');
+    const gcloud_topic_name = Reflect.get(event_data, 'app.gcloud_topic_name');
+    const gcloud_subscription_name = Reflect.get(event_data, 'app.gcloud_subscription_name');
+    const publish_to_topic_name = event_data['app.request']
+      ? Reflect.get(event_data['app.request'], 'publish_to_topic_name')
+      : Reflect.get(event_data, 'app.request.publish_to_topic_name');
+    const client_request_id = event_data['app.request']
+      ? Reflect.get(event_data['app.request'], 'client_request_id')
+      : Reflect.get(event_data, 'app.request.client_request_id');
 
     const parent_id = Reflect.get(event_data, HoneycombSchema.TRACE_PARENT_ID);
     if (
-      client_request_id === 'GetAllQueuedSubscriptionRequests' &&
       name === 'resolve' &&
-      publish_to_topic_name.match(/^\w+_GRAPHQL_RESPONSE_\w+$/)
+      gcloud_topic_name?.match(/^[\w-]+_GRAPHQL_REQUEST$/) &&
+      gcloud_subscription_name?.match(/^[\w-]+_GRAPHQL_REQUEST_orders$/) &&
+      publish_to_topic_name?.match(/^[\w-]+_GRAPHQL_RESPONSE_\w+$/) &&
+      client_request_id === 'GetAllQueuedSubscriptionRequests'
     ) {
       if (!parent_id) {
         return { ...super.sample(event_data), matched: true };
