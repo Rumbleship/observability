@@ -10,7 +10,7 @@ export const beelineResponseInterceptorFactory: (
   beeline: RumbleshipBeeline
 ) => {
   const interceptor = (response: AxiosResponse) => {
-    if (response.status >= 400) {
+    if (response.status && response.status >= 400) {
       const sanitized = sanitizer(response);
       const data = (sanitized as any).response.data;
       if (data && response) {
