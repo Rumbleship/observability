@@ -5,7 +5,7 @@ export type ResponseSanitizer = (_0: AxiosResponse) => AxiosResponse;
 export const beelineResponseInterceptorFactory: (
   _0: ResponseSanitizer,
   _1: RumbleshipBeeline
-) => (_1: AxiosResponse) => Promise<AxiosResponse> = (
+) => (_1: AxiosResponse) => AxiosResponse | Promise<AxiosResponse> = (
   sanitizer: ResponseSanitizer,
   beeline: RumbleshipBeeline
 ) => {
@@ -21,7 +21,7 @@ export const beelineResponseInterceptorFactory: (
       }
       return Promise.reject(sanitized);
     } else {
-      return Promise.resolve(response);
+      return response;
     }
   };
   return beeline.bindFunctionToTrace(interceptor);
