@@ -18,11 +18,14 @@
     "coverage": "NODE_PATH=. tsc -p ./tsconfig-build.json && NODE_PATH=. jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/jest": "^24.0.6",
     "@types/node": "^12.0.4",
     "@types/uuid": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
+    "axios": "^0.21.1",
+    "axios-mock-adapter": "^1.19.0",
     "babel-core": "^7.0.0-0",
     "babel-jest": "^24.1.0",
     "coveralls": "^3.0.3",

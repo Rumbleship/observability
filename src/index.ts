@@ -9,3 +9,4 @@ export * from './samplers/health-check.sampler';
 export * from './samplers/root-route.sampler';
 export * from './samplers/route.sampler';
 export * from './extract-gae-version-data';
+export * from './axios';
