@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 ### Changed
 ### Fixed
-  * Axios interceptor should not Promise.resolve() on success case
+  * Axios interceptor is hardcoded to be an Error interceptor
 ### Deprecated
 ### Security
 
