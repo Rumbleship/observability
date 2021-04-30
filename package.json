@@ -6,7 +6,7 @@
   ],
   "main": "lib/index.js",
   "description": "Helpers and tools for simpler interface with Honeycomb / Observability stack",
-  "license": "UNLICENSED",
+  "license": "mit",
   "private": true,
   "engines": {
     "node": "10.x || 12.x"
